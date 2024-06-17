@@ -1,3 +1,5 @@
+# This is a private continuation of the AVET Project by govolution: https://github.com/govolution/avet
+
 # AntiVirus Evasion Tool
 
 
