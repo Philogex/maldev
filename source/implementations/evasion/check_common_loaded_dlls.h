@@ -5,7 +5,7 @@
 #include <psapi.h>
 #include <stdbool.h>
 
-PVOID get_original_func_addr(const wchar_t *dll, const wchar_t *func) {
+PVOID get_original_func_addr(const wchar_t *dll, const char *func) {
     wchar_t dll_path[MAX_PATH];
     wcscpy(dll_path, L"C:\\Windows\\System32\\");
     wcscat(dll_path, dll);
@@ -38,6 +38,7 @@ PVOID get_original_func_addr(const wchar_t *dll, const wchar_t *func) {
 
     return pFuncOriginal;
 }
+
 
 void check_common_loaded_dlls() {
     const wchar_t *dlls[] = {
