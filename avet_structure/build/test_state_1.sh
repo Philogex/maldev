@@ -1,5 +1,5 @@
 #!/bin/bash
-cat cat.txt
+cat banner.txt
 
 # include script containing the compiler var $win32_compiler
 # you can edit the compiler in build/global_win32.sh
