@@ -1,4 +1,0 @@
-# ninja log v6
-0	309	1724471135962340357	CMakeFiles/win64_llvm.dir/src/example.cpp.o	9e48d253d8084c9a
-1	1015	1724471135962340357	CMakeFiles/win64_llvm.dir/src/main.cpp.o	a14c9556fd31667a
-1015	1178	1724471136973834359	bin/win64_llvm	3e44b61719a40ef7

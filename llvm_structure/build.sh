@@ -9,15 +9,34 @@ if ! command -v cmake &> /dev/null; then
     ./install.sh
 fi
 
-# Create and navigate to the build directory
-mkdir -p build
+# Navigate to the project build directory
 cd build
 
-# Run CMake with Ninja for cross-compilation
-cmake -G "Ninja" ..
+# Generate IR and link all source files
+echo "Generating IR and linking sources"
+clang++ -S -emit-llvm ../src/*.cpp
+llvm-link -o ../out/win64_llvm.bc *.ll
 
-# Build the project
+# Navigate to the project build directory
+cd ../lib/passes/build
+
+# Compile "MyPass" into a shared library
+echo "Building MyPass into shared library"
+cmake -G "Ninja" ../
 cmake --build .
 
+# Navigate to the project build directory
+cd ../../../build
+
+# Running custom llvm pass on project bytecode
+echo "Running custom llvm pass on project bc"
+opt -load-pass-plugin ./../lib/passes/build/libMyPass.so -passes="my-pass" < ../out/win64_llvm.bc > /dev/null
+
+# Run CMake with Ninja for cross-compilation
+#cmake -G "Ninja" ..
+
+# Build the project
+#cmake --build .
+
 # Return to the project root directory
-cd ..
+#cd ..

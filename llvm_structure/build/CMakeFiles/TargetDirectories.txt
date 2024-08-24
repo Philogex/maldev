@@ -1,3 +1,0 @@
-/home/kali/Desktop/malware_development/llvm_structure/build/CMakeFiles/win64_llvm.dir
-/home/kali/Desktop/malware_development/llvm_structure/build/CMakeFiles/edit_cache.dir
-/home/kali/Desktop/malware_development/llvm_structure/build/CMakeFiles/rebuild_cache.dir
