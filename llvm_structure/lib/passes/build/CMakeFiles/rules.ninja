@@ -22,11 +22,11 @@ rule CXX_COMPILER__MyPass_unscanned_
 
 
 #############################################
-# Rule for linking CXX shared module.
+# Rule for linking CXX shared library.
 
-rule CXX_MODULE_LIBRARY_LINKER__MyPass_
+rule CXX_SHARED_LIBRARY_LINKER__MyPass_
   command = $PRE_LINK && /usr/lib/llvm-17/bin/clang -fPIC $LANGUAGE_COMPILE_FLAGS $ARCH_FLAGS $LINK_FLAGS -shared $SONAME_FLAG$SONAME -o $TARGET_FILE $in $LINK_PATH $LINK_LIBRARIES && $POST_BUILD
-  description = Linking CXX shared module $TARGET_FILE
+  description = Linking CXX shared library $TARGET_FILE
   restat = $RESTAT
 
 

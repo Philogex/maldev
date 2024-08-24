@@ -61,8 +61,8 @@ events:
     checks:
       - "Detecting C compiler ABI info"
     directories:
-      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh"
-      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh"
+      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe"
+      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-17"
       CMAKE_C_FLAGS: ""
@@ -72,10 +72,10 @@ events:
       variable: "CMAKE_C_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh'
+        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe'
         
-        Run Build Command(s): /usr/bin/ninja -v cmTC_fc028
-        [1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c
+        Run Build Command(s): /usr/bin/ninja -v cmTC_9b15d
+        [1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c
         Debian clang version 17.0.6 (15)
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -86,7 +86,7 @@ events:
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
          (in-process)
-         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c
+         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c
         clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu
         ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include"
         ignoring nonexistent directory "/include"
@@ -97,7 +97,7 @@ events:
          /usr/include/x86_64-linux-gnu
          /usr/include
         End of search list.
-        [2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl,-v CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -o cmTC_fc028   && :
+        [2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl,-v CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -o cmTC_9b15d   && :
         Debian clang version 17.0.6 (15)
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -107,7 +107,7 @@ events:
         Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/14
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
-         "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_fc028 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+         "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_9b15d /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o
         GNU ld (GNU Binutils for Debian) 2.43
         
       exitCode: 0
@@ -143,10 +143,10 @@ events:
       Parsed C implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?))("|,| |$)]
-        ignore line: [Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh']
+        ignore line: [Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe']
         ignore line: []
-        ignore line: [Run Build Command(s): /usr/bin/ninja -v cmTC_fc028]
-        ignore line: [[1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
+        ignore line: [Run Build Command(s): /usr/bin/ninja -v cmTC_9b15d]
+        ignore line: [[1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -MF CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o.d -o CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
         ignore line: [Debian clang version 17.0.6 (15)]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -159,7 +159,7 @@ events:
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
         ignore line: [ (in-process)]
-        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-2zpRkh -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
+        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCCompilerABI.c -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o.d -MT CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -sys-header-deps -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-WgWYxe -ferror-limit 19 -fgnuc-version=4.2.1 -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -x c /usr/share/cmake-3.29/Modules/CMakeCCompilerABI.c]
         ignore line: [clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu]
         ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include"]
         ignore line: [ignoring nonexistent directory "/include"]
@@ -170,7 +170,7 @@ events:
         ignore line: [ /usr/include/x86_64-linux-gnu]
         ignore line: [ /usr/include]
         ignore line: [End of search list.]
-        ignore line: [[2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl -v CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -o cmTC_fc028   && :]
+        ignore line: [[2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl -v CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -o cmTC_9b15d   && :]
         ignore line: [Debian clang version 17.0.6 (15)]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -182,7 +182,7 @@ events:
         ignore line: [@m64]
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
-        link line: [ "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_fc028 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+        link line: [ "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_9b15d /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
           arg [/usr/bin/ld] ==> ignore
           arg [-pie] ==> ignore
           arg [--hash-style=gnu] ==> ignore
@@ -193,7 +193,7 @@ events:
           arg [-dynamic-linker] ==> ignore
           arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_fc028] ==> ignore
+          arg [cmTC_9b15d] ==> ignore
           arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
           arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
           arg [/usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o]
@@ -206,7 +206,7 @@ events:
           arg [-L/lib] ==> dir [/lib]
           arg [-L/usr/lib] ==> dir [/usr/lib]
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_fc028.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [CMakeFiles/cmTC_9b15d.dir/CMakeCCompilerABI.c.o] ==> ignore
           arg [-lgcc] ==> lib [gcc]
           arg [--as-needed] ==> ignore
           arg [-lgcc_s] ==> lib [gcc_s]
@@ -252,8 +252,8 @@ events:
     checks:
       - "Detecting CXX compiler ABI info"
     directories:
-      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf"
-      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf"
+      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf"
+      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-17"
       CMAKE_CXX_FLAGS: ""
@@ -264,10 +264,10 @@ events:
       variable: "CMAKE_CXX_ABI_COMPILED"
       cached: true
       stdout: |
-        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf'
+        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf'
         
-        Run Build Command(s): /usr/bin/ninja -v cmTC_70562
-        [1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp
+        Run Build Command(s): /usr/bin/ninja -v cmTC_8983d
+        [1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp
         Debian clang version 17.0.6 (15)
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -278,7 +278,7 @@ events:
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
          (in-process)
-         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp
+         "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp
         clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu
         ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include"
         ignoring nonexistent directory "/include"
@@ -292,7 +292,7 @@ events:
          /usr/include/x86_64-linux-gnu
          /usr/include
         End of search list.
-        [2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl,-v CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_70562   && :
+        [2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl,-v CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_8983d   && :
         Debian clang version 17.0.6 (15)
         Target: x86_64-pc-linux-gnu
         Thread model: posix
@@ -302,7 +302,7 @@ events:
         Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/14
         Candidate multilib: .;@m64
         Selected multilib: .;@m64
-         "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_70562 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o
+         "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_8983d /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o
         GNU ld (GNU Binutils for Debian) 2.43
         
       exitCode: 0
@@ -344,10 +344,10 @@ events:
       Parsed CXX implicit link information:
         link line regex: [^( *|.*[/\\])(ld[0-9]*(\\.[a-z]+)?|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
         linker tool regex: [^[ 	]*(->|")?[ 	]*(([^"]*[/\\])?(ld[0-9]*(\\.[a-z]+)?))("|,| |$)]
-        ignore line: [Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf']
+        ignore line: [Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf']
         ignore line: []
-        ignore line: [Run Build Command(s): /usr/bin/ninja -v cmTC_70562]
-        ignore line: [[1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Run Build Command(s): /usr/bin/ninja -v cmTC_8983d]
+        ignore line: [[1/2] /usr/lib/llvm-17/bin/clang   -v -MD -MT CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -MF CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o.d -o CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -c /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [Debian clang version 17.0.6 (15)]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -360,7 +360,7 @@ events:
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
         ignore line: [ (in-process)]
-        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-QZkJcf -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [ "/usr/lib/llvm-17/bin/clang" -cc1 -triple x86_64-pc-linux-gnu -emit-obj -mrelax-all -disable-free -clear-ast-before-backend -disable-llvm-verifier -discard-value-names -main-file-name CMakeCXXCompilerABI.cpp -mrelocation-model pic -pic-level 2 -pic-is-pie -mframe-pointer=all -fmath-errno -ffp-contract=on -fno-rounding-math -mconstructor-aliases -funwind-tables=2 -target-cpu x86-64 -tune-cpu generic -debugger-tuning=gdb -v -fcoverage-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf -resource-dir /usr/lib/llvm-17/lib/clang/17 -dependency-file CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o.d -MT CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -sys-header-deps -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/x86_64-linux-gnu/c++/14 -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../include/c++/14/backward -internal-isystem /usr/lib/llvm-17/lib/clang/17/include -internal-isystem /usr/local/include -internal-isystem /usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include -internal-externc-isystem /usr/include/x86_64-linux-gnu -internal-externc-isystem /include -internal-externc-isystem /usr/include -fdeprecated-macro -fdebug-compilation-dir=/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-acUyBf -ferror-limit 19 -fgnuc-version=4.2.1 -fcxx-exceptions -fexceptions -faddrsig -D__GCC_HAVE_DWARF2_CFI_ASM=1 -o CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -x c++ /usr/share/cmake-3.29/Modules/CMakeCXXCompilerABI.cpp]
         ignore line: [clang -cc1 version 17.0.6 based upon LLVM 17.0.6 default target x86_64-pc-linux-gnu]
         ignore line: [ignoring nonexistent directory "/usr/lib/gcc/x86_64-linux-gnu/14/../../../../x86_64-linux-gnu/include"]
         ignore line: [ignoring nonexistent directory "/include"]
@@ -374,7 +374,7 @@ events:
         ignore line: [ /usr/include/x86_64-linux-gnu]
         ignore line: [ /usr/include]
         ignore line: [End of search list.]
-        ignore line: [[2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl -v CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_70562   && :]
+        ignore line: [[2/2] : && /usr/lib/llvm-17/bin/clang  -v -Wl -v CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_8983d   && :]
         ignore line: [Debian clang version 17.0.6 (15)]
         ignore line: [Target: x86_64-pc-linux-gnu]
         ignore line: [Thread model: posix]
@@ -386,7 +386,7 @@ events:
         ignore line: [@m64]
         ignore line: [Selected multilib: .]
         ignore line: [@m64]
-        link line: [ "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_70562 /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
+        link line: [ "/usr/bin/ld" -pie --hash-style=gnu --build-id --eh-frame-hdr -m elf_x86_64 -dynamic-linker /lib64/ld-linux-x86-64.so.2 -o cmTC_8983d /lib/x86_64-linux-gnu/Scrt1.o /lib/x86_64-linux-gnu/crti.o /usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o -L/usr/lib/gcc/x86_64-linux-gnu/14 -L/usr/lib/gcc/x86_64-linux-gnu/14/../../../../lib64 -L/lib/x86_64-linux-gnu -L/lib/../lib64 -L/usr/lib/x86_64-linux-gnu -L/usr/lib/../lib64 -L/lib -L/usr/lib -v CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o -lgcc --as-needed -lgcc_s --no-as-needed -lc -lgcc --as-needed -lgcc_s --no-as-needed /usr/lib/gcc/x86_64-linux-gnu/14/crtendS.o /lib/x86_64-linux-gnu/crtn.o]
           arg [/usr/bin/ld] ==> ignore
           arg [-pie] ==> ignore
           arg [--hash-style=gnu] ==> ignore
@@ -397,7 +397,7 @@ events:
           arg [-dynamic-linker] ==> ignore
           arg [/lib64/ld-linux-x86-64.so.2] ==> ignore
           arg [-o] ==> ignore
-          arg [cmTC_70562] ==> ignore
+          arg [cmTC_8983d] ==> ignore
           arg [/lib/x86_64-linux-gnu/Scrt1.o] ==> obj [/lib/x86_64-linux-gnu/Scrt1.o]
           arg [/lib/x86_64-linux-gnu/crti.o] ==> obj [/lib/x86_64-linux-gnu/crti.o]
           arg [/usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o] ==> obj [/usr/lib/gcc/x86_64-linux-gnu/14/crtbeginS.o]
@@ -410,7 +410,7 @@ events:
           arg [-L/lib] ==> dir [/lib]
           arg [-L/usr/lib] ==> dir [/usr/lib]
           arg [-v] ==> ignore
-          arg [CMakeFiles/cmTC_70562.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [CMakeFiles/cmTC_8983d.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
           arg [-lgcc] ==> lib [gcc]
           arg [--as-needed] ==> ignore
           arg [-lgcc_s] ==> lib [gcc_s]
@@ -452,58 +452,29 @@ events:
     backtrace:
       - "/usr/share/cmake-3.29/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
       - "/usr/share/cmake-3.29/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
-      - "/usr/lib/llvm-17/cmake/FindFFI.cmake:44 (check_c_source_compiles)"
-      - "/usr/lib/llvm-17/cmake/LLVMConfig.cmake:276 (find_package)"
-      - "CMakeLists.txt:9 (find_package)"
+      - "/usr/lib/llvm-16/lib/cmake/llvm/FindFFI.cmake:44 (check_c_source_compiles)"
+      - "/usr/lib/llvm-16/cmake/LLVMConfig.cmake:276 (find_package)"
+      - "CMakeLists.txt:12 (find_package)"
     checks:
       - "Performing Test HAVE_FFI_CALL"
     directories:
-      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-zKPgaB"
-      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-zKPgaB"
+      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-fDwRXu"
+      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-fDwRXu"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-17"
       CMAKE_C_FLAGS: ""
       CMAKE_C_FLAGS_DEBUG: "-g"
       CMAKE_EXE_LINKER_FLAGS: ""
-      CMAKE_MODULE_PATH: "/usr/lib/llvm-17/cmake"
+      CMAKE_MODULE_PATH: "/usr/lib/llvm-16/lib/cmake/llvm;/usr/lib/llvm-16/cmake"
     buildResult:
       variable: "HAVE_FFI_CALL"
       cached: true
       stdout: |
-        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-zKPgaB'
+        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-fDwRXu'
         
-        Run Build Command(s): /usr/bin/ninja -v cmTC_6f4a2
-        [1/2] /usr/lib/llvm-17/bin/clang -DHAVE_FFI_CALL   -MD -MT CMakeFiles/cmTC_6f4a2.dir/src.c.o -MF CMakeFiles/cmTC_6f4a2.dir/src.c.o.d -o CMakeFiles/cmTC_6f4a2.dir/src.c.o -c /home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-zKPgaB/src.c
-        [2/2] : && /usr/lib/llvm-17/bin/clang   CMakeFiles/cmTC_6f4a2.dir/src.c.o -o cmTC_6f4a2  /usr/lib/x86_64-linux-gnu/libffi.so && :
-        
-      exitCode: 0
-  -
-    kind: "try_compile-v1"
-    backtrace:
-      - "/usr/share/cmake-3.29/Modules/CheckIncludeFile.cmake:90 (try_compile)"
-      - "/usr/lib/llvm-17/cmake/FindLibEdit.cmake:28 (check_include_file)"
-      - "/usr/lib/llvm-17/cmake/LLVMConfig.cmake:283 (find_package)"
-      - "CMakeLists.txt:9 (find_package)"
-    checks:
-      - "Looking for histedit.h"
-    directories:
-      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-z47zlX"
-      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-z47zlX"
-    cmakeVariables:
-      CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-17"
-      CMAKE_C_FLAGS: ""
-      CMAKE_C_FLAGS_DEBUG: "-g"
-      CMAKE_EXE_LINKER_FLAGS: ""
-      CMAKE_MODULE_PATH: "/usr/lib/llvm-17/cmake"
-    buildResult:
-      variable: "HAVE_HISTEDIT_H"
-      cached: true
-      stdout: |
-        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-z47zlX'
-        
-        Run Build Command(s): /usr/bin/ninja -v cmTC_fcd16
-        [1/2] /usr/lib/llvm-17/bin/clang    -MD -MT CMakeFiles/cmTC_fcd16.dir/CheckIncludeFile.c.o -MF CMakeFiles/cmTC_fcd16.dir/CheckIncludeFile.c.o.d -o CMakeFiles/cmTC_fcd16.dir/CheckIncludeFile.c.o -c /home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-z47zlX/CheckIncludeFile.c
-        [2/2] : && /usr/lib/llvm-17/bin/clang   CMakeFiles/cmTC_fcd16.dir/CheckIncludeFile.c.o -o cmTC_fcd16  /usr/lib/x86_64-linux-gnu/libedit.so && :
+        Run Build Command(s): /usr/bin/ninja -v cmTC_54ca2
+        [1/2] /usr/lib/llvm-17/bin/clang -DHAVE_FFI_CALL   -MD -MT CMakeFiles/cmTC_54ca2.dir/src.c.o -MF CMakeFiles/cmTC_54ca2.dir/src.c.o.d -o CMakeFiles/cmTC_54ca2.dir/src.c.o -c /home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-fDwRXu/src.c
+        [2/2] : && /usr/lib/llvm-17/bin/clang   CMakeFiles/cmTC_54ca2.dir/src.c.o -o cmTC_54ca2  /usr/lib/x86_64-linux-gnu/libffi.so && :
         
       exitCode: 0
   -
@@ -511,29 +482,29 @@ events:
     backtrace:
       - "/usr/share/cmake-3.29/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
       - "/usr/share/cmake-3.29/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
-      - "/usr/lib/llvm-17/cmake/FindTerminfo.cmake:21 (check_c_source_compiles)"
-      - "/usr/lib/llvm-17/cmake/LLVMConfig.cmake:288 (find_package)"
-      - "CMakeLists.txt:9 (find_package)"
+      - "/usr/lib/llvm-16/lib/cmake/llvm/FindTerminfo.cmake:21 (check_c_source_compiles)"
+      - "/usr/lib/llvm-16/cmake/LLVMConfig.cmake:283 (find_package)"
+      - "CMakeLists.txt:12 (find_package)"
     checks:
       - "Performing Test Terminfo_LINKABLE"
     directories:
-      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-IxfkYp"
-      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-IxfkYp"
+      source: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-U8UPSI"
+      binary: "/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-U8UPSI"
     cmakeVariables:
       CMAKE_CXX_COMPILER_CLANG_SCAN_DEPS: "/usr/bin/clang-scan-deps-17"
       CMAKE_C_FLAGS: ""
       CMAKE_C_FLAGS_DEBUG: "-g"
       CMAKE_EXE_LINKER_FLAGS: ""
-      CMAKE_MODULE_PATH: "/usr/lib/llvm-17/cmake"
+      CMAKE_MODULE_PATH: "/usr/lib/llvm-16/lib/cmake/llvm;/usr/lib/llvm-16/cmake"
     buildResult:
       variable: "Terminfo_LINKABLE"
       cached: true
       stdout: |
-        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-IxfkYp'
+        Change Dir: '/home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-U8UPSI'
         
-        Run Build Command(s): /usr/bin/ninja -v cmTC_865fd
-        [1/2] /usr/lib/llvm-17/bin/clang -DTerminfo_LINKABLE   -MD -MT CMakeFiles/cmTC_865fd.dir/src.c.o -MF CMakeFiles/cmTC_865fd.dir/src.c.o.d -o CMakeFiles/cmTC_865fd.dir/src.c.o -c /home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-IxfkYp/src.c
-        [2/2] : && /usr/lib/llvm-17/bin/clang   CMakeFiles/cmTC_865fd.dir/src.c.o -o cmTC_865fd  /usr/lib/x86_64-linux-gnu/libtinfo.so && :
+        Run Build Command(s): /usr/bin/ninja -v cmTC_71516
+        [1/2] /usr/lib/llvm-17/bin/clang -DTerminfo_LINKABLE   -MD -MT CMakeFiles/cmTC_71516.dir/src.c.o -MF CMakeFiles/cmTC_71516.dir/src.c.o.d -o CMakeFiles/cmTC_71516.dir/src.c.o -c /home/kali/Desktop/malware_development/llvm_structure/lib/passes/build/CMakeFiles/CMakeScratch/TryCompile-U8UPSI/src.c
+        [2/2] : && /usr/lib/llvm-17/bin/clang   CMakeFiles/cmTC_71516.dir/src.c.o -o cmTC_71516  /usr/lib/x86_64-linux-gnu/libtinfo.so && :
         
       exitCode: 0
 ...
