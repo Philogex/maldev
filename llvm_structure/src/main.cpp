@@ -1,5 +1,6 @@
 // src/main.cpp
 #include <iostream>
+#include <windows.h>
 #include "../include/example.h"
 
 int main() {
