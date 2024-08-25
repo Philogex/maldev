@@ -13,21 +13,45 @@ module asm ".globl _ZSt21ios_base_library_initv"
 
 @_ZSt4cout = external global %"class.std::basic_ostream", align 8
 @.str = private unnamed_addr constant [14 x i8] c"Hello, World!\00", align 1
+@.str.1 = private unnamed_addr constant [6 x i8] c"ntdll\00", align 1
+@.str.2 = private unnamed_addr constant [19 x i8] c"NtMapViewOfSection\00", align 1
 
 ; Function Attrs: mustprogress noinline norecurse optnone uwtable
 define dso_local noundef i32 @main() #0 {
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
+  %4 = alloca ptr, align 8
+  %5 = alloca ptr, align 8
   store i32 0, ptr %1, align 4
-  %4 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str)
-  %5 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %4, ptr noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  %6 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str)
+  %7 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %6, ptr noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
   store volatile i32 42, ptr %2, align 4
-  %6 = load volatile i32, ptr %2, align 4
-  %7 = mul nsw i32 %6, 2
-  store i32 %7, ptr %3, align 4
+  %8 = load volatile i32, ptr %2, align 4
+  %9 = mul nsw i32 %8, 2
+  store i32 %9, ptr %3, align 4
   call void @_Z15exampleFunctionv()
-  ret i32 0
+  %10 = call ptr @LoadLibraryA(ptr noundef @.str.1)
+  store ptr %10, ptr %5, align 8
+  %11 = icmp ne ptr %10, null
+  br i1 %11, label %13, label %12
+
+12:                                               ; preds = %0
+  store i32 -1, ptr %1, align 4
+  br label %18
+
+13:                                               ; preds = %0
+  %14 = load ptr, ptr %5, align 8
+  %15 = call ptr @GetProcAddress(ptr noundef %14, ptr noundef @.str.2)
+  store ptr %15, ptr %4, align 8
+  %16 = load ptr, ptr %4, align 8
+  %17 = call noundef i32 %16(ptr noundef null, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, i32 noundef 0)
+  store i32 0, ptr %1, align 4
+  br label %18
+
+18:                                               ; preds = %13, %12
+  %19 = load i32, ptr %1, align 4
+  ret i32 %19
 }
 
 declare dso_local noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8), ptr noundef) #1
@@ -37,6 +61,10 @@ declare dso_local noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEPFRSoS
 declare dso_local noundef nonnull align 8 dereferenceable(8) ptr @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(ptr noundef nonnull align 8 dereferenceable(8)) #1
 
 declare dso_local void @_Z15exampleFunctionv() #1
+
+declare dllimport ptr @LoadLibraryA(ptr noundef) #1
+
+declare dllimport ptr @GetProcAddress(ptr noundef, ptr noundef) #1
 
 attributes #0 = { mustprogress noinline norecurse optnone uwtable "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }
 attributes #1 = { "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="x86-64" "target-features"="+cx8,+fxsr,+mmx,+sse,+sse2,+x87" "tune-cpu"="generic" }

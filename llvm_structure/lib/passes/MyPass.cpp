@@ -1,7 +1,15 @@
+/*
+    I might or might not have to modify the AST later on as described in https://blog.scrt.ch/2020/06/19/engineering-antivirus-evasion/
+    clang -Xclang -ast-dump -fsyntax-only main.cpp to only look at the AST for now
+*/
+
 #include "llvm/IR/PassManager.h"
-#include "llvm/Passes/PassBuilder.h"        // Include for PassBuilder
-#include "llvm/Passes/PassPlugin.h"         // Include for PassPluginLibraryInfo
-#include "llvm/Support/raw_ostream.h"       // Include for printing
+#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Passes/PassPlugin.h"
+#include "llvm/Support/raw_ostream.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/GlobalVariable.h"
+#include "llvm/IR/Constants.h"
 
 using namespace llvm;
 

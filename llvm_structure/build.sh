@@ -25,7 +25,7 @@ printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
 # Generate IR and link all source files
 echo "Generating IR and linking sources"
-clang++ -S -emit-llvm -target x86_64-w64-mingw32 -I/usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/x86_64-w64-mingw32/ -I/usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/ -I/usr/x86_64-w64-mingw32/include/ ../src/*.cpp
+clang++ -S -emit-llvm --target=x86_64-w64-mingw32 -I/usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/x86_64-w64-mingw32/ -I/usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/ -I/usr/x86_64-w64-mingw32/include/ ../src/*.cpp
 llvm-link -o win64_llvm.bc *.ll
 llvm-dis -o win64_llvm.ll win64_llvm.bc # holy shit im actually balding after this. why does it only work on .ll files even tho clang has support for both .bc as well as .ll files
 
@@ -50,7 +50,7 @@ printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
 # Running custom llvm pass on project IR
 echo "Running custom llvm pipeline on project .ll ..."
-opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -p my-pass -S < win64_llvm.ll > win64_llvm_transform.ll
+opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -p my-pass -S < win64_llvm.ll > win64_llvm_transform.ll # i also just read the opt --help. god damn i love the polly options, but we are not here to optimize
 # opt -load-pass-plugin=<other pass> -passes="<pass name>" -S < win64_llvm_transform.ll > win64_llvm_transform.ll
 echo "Finished running custom llvm pipeline on project .ll"
 
@@ -62,7 +62,7 @@ echo "Finished running custom llvm pipeline on project .ll"
 
 printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
-# Placeholder until i fix CMake Pipeline
+# Placeholder until i fix CMake pipeline
 echo "Generating executable from transform.ll ..."
 clang++ -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o ../out/win64_llvm win64_llvm_transform.ll
 echo "Finished generating executable"
@@ -75,7 +75,14 @@ printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 # Check Project files
 exiftool out/win64_llvm.exe > out/win64_llvm_exif.txt
 cat out/win64_llvm_exif.txt
+
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
+strip out/win64_llvm.exe
+
+strings out/win64_llvm.exe > out/win64_llvm_strings.txt
 objdump -d out/win64_llvm.exe > out/win64_llvm_disasm.txt
+
 clang++ -O0 -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o out/win64_llvm_O0.s build/win64_llvm_transform.ll -S
 clang++ -O2 -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o out/win64_llvm_O2.s build/win64_llvm_transform.ll -S
 echo "Checking diff..."
@@ -87,4 +94,3 @@ else
 fi
 
 printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
-
