@@ -1,7 +1,16 @@
 #!/bin/bash
 
-# Very Important
+length=80
+divider_character="="
+
+# Very important
 cat ../cat.txt
+
+
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
+# Clean project files until i setup other checks to prevent warnings and errors
+./clean.sh
 
 # Check if cmake is installed, if not, run install.sh
 if ! command -v cmake &> /dev/null; then
@@ -11,6 +20,8 @@ fi
 
 # Navigate to the project build directory
 cd build
+
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
 # Generate IR and link all source files
 echo "Generating IR and linking sources"
@@ -25,6 +36,8 @@ cd ../lib/passes/build
 export CC=/usr/lib/llvm-17/bin/clang
 export CXX=/usr/lib/llvm-17/bin/clang
 
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
 # Compile "MyPass" into a shared library
 echo "Building MyPass into shared library"
 cmake -G "Ninja" ../
@@ -33,11 +46,12 @@ cmake --build .
 # Navigate to the project build directory
 cd ../../../build
 
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
 # Running custom llvm pass on project IR
-echo "Running custom llvm pipeline on project .ll"
-# opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -passes="default<O2>,my-pass" < win64_llvm.bc > /dev/null
-opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -passes="my-pass" < win64_llvm.ll > /dev/null
-# opt -passes="default<O2>" < win64_llvm.bc > /dev/null
+echo "Running custom llvm pipeline on project .ll ..."
+opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -p my-pass -S < win64_llvm.ll > win64_llvm_transform.ll
+# opt -load-pass-plugin=<other pass> -passes="<pass name>" -S < win64_llvm_transform.ll > win64_llvm_transform.ll
 echo "Finished running custom llvm pipeline on project .ll"
 
 # Run CMake with Ninja for cross-compilation
@@ -46,10 +60,31 @@ echo "Finished running custom llvm pipeline on project .ll"
 # Build the project
 # cmake --build .
 
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
 # Placeholder until i fix CMake Pipeline
-echo "Generating executable..."
-clang++ -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o ../out/win64_llvm win64_llvm.ll
-echo "Generated executable"
+echo "Generating executable from transform.ll ..."
+clang++ -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o ../out/win64_llvm win64_llvm_transform.ll
+echo "Finished generating executable"
 
 # Return to the project root directory
 cd ..
+
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
+# Check Project files
+exiftool out/win64_llvm.exe > out/win64_llvm_exif.txt
+cat out/win64_llvm_exif.txt
+objdump -d out/win64_llvm.exe > out/win64_llvm_disasm.txt
+clang++ -O0 -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o out/win64_llvm_O0.s build/win64_llvm_transform.ll -S
+clang++ -O2 -Wno-unused-command-line-argument --target=x86_64-w64-mingw32 -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ -static-libgcc -static-libstdc++ -o out/win64_llvm_O2.s build/win64_llvm_transform.ll -S
+echo "Checking diff..."
+diff out/win64_llvm_O0.s out/win64_llvm_O2.s
+if [ $? -eq 0 ]; then
+  echo "O0 and O2 are the same"
+else
+  echo "Code would be optimized by O2"
+fi
+
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
