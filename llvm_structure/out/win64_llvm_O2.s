@@ -45,10 +45,10 @@ main:                                   # @main
 # %bb.0:
 	pushq	%rbp
 	.seh_pushreg %rbp
-	subq	$112, %rsp
-	.seh_stackalloc 112
-	leaq	112(%rsp), %rbp
-	.seh_setframe %rbp, 112
+	subq	$128, %rsp
+	.seh_stackalloc 128
+	leaq	128(%rsp), %rbp
+	.seh_setframe %rbp, 128
 	.seh_endprologue
 	callq	__main
 	movl	$0, -4(%rbp)
@@ -58,24 +58,26 @@ main:                                   # @main
 	leaq	_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_(%rip), %rdx
 	movq	%rax, %rcx
 	callq	_ZNSolsEPFRSoS_E
-	movl	$42, -8(%rbp)
-	movl	-8(%rbp), %eax
+	movl	$42, -12(%rbp)
+	movl	-12(%rbp), %eax
 	shll	$1, %eax
-	movl	%eax, -28(%rbp)
+	movl	%eax, -8(%rbp)
+	imull	$69, -8(%rbp), %eax
+	movl	%eax, -36(%rbp)
 	callq	_Z15exampleFunctionv
 	leaq	.L.str.1.2(%rip), %rcx
 	callq	*__imp_LoadLibraryA(%rip)
-	movq	%rax, -16(%rbp)
+	movq	%rax, -24(%rbp)
 	cmpq	$0, %rax
 	jne	.LBB1_2
 # %bb.1:
 	movl	$-1, -4(%rbp)
 	jmp	.LBB1_3
 .LBB1_2:
-	movq	-16(%rbp), %rcx
+	movq	-24(%rbp), %rcx
 	leaq	.L.str.2(%rip), %rdx
 	callq	*__imp_GetProcAddress(%rip)
-	movq	%rax, -24(%rbp)
+	movq	%rax, -32(%rbp)
 	xorl	%ecx, %ecx
 	xorl	%edx, %edx
 	xorl	%r8d, %r8d
@@ -86,11 +88,11 @@ main:                                   # @main
 	movl	$0, 56(%rsp)
 	movl	$0, 64(%rsp)
 	movl	$0, 72(%rsp)
-	callq	*-24(%rbp)
+	callq	*-32(%rbp)
 	movl	$0, -4(%rbp)
 .LBB1_3:
 	movl	-4(%rbp), %eax
-	addq	$112, %rsp
+	addq	$128, %rsp
 	popq	%rbp
 	retq
 	.seh_endproc

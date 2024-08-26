@@ -36,37 +36,41 @@ define dso_local noundef i32 @main() #2 {
   %1 = alloca i32, align 4
   %2 = alloca i32, align 4
   %3 = alloca i32, align 4
-  %4 = alloca ptr, align 8
+  %4 = alloca i32, align 4
   %5 = alloca ptr, align 8
+  %6 = alloca ptr, align 8
   store i32 0, ptr %1, align 4
-  %6 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str.1)
-  %7 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %6, ptr noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
+  %7 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZStlsISt11char_traitsIcEERSt13basic_ostreamIcT_ES5_PKc(ptr noundef nonnull align 8 dereferenceable(8) @_ZSt4cout, ptr noundef @.str.1)
+  %8 = call noundef nonnull align 8 dereferenceable(8) ptr @_ZNSolsEPFRSoS_E(ptr noundef nonnull align 8 dereferenceable(8) %7, ptr noundef @_ZSt4endlIcSt11char_traitsIcEERSt13basic_ostreamIT_T0_ES6_)
   store volatile i32 42, ptr %2, align 4
-  %8 = load volatile i32, ptr %2, align 4
-  %9 = mul nsw i32 %8, 2
-  store i32 %9, ptr %3, align 4
+  %9 = load volatile i32, ptr %2, align 4
+  %10 = mul nsw i32 %9, 2
+  store i32 %10, ptr %3, align 4
+  %11 = load i32, ptr %3, align 4
+  %12 = mul nsw i32 %11, 69
+  store i32 %12, ptr %4, align 4
   call void @_Z15exampleFunctionv()
-  %10 = call ptr @LoadLibraryA(ptr noundef @.str.1.2)
-  store ptr %10, ptr %5, align 8
-  %11 = icmp ne ptr %10, null
-  br i1 %11, label %13, label %12
+  %13 = call ptr @LoadLibraryA(ptr noundef @.str.1.2)
+  store ptr %13, ptr %6, align 8
+  %14 = icmp ne ptr %13, null
+  br i1 %14, label %16, label %15
 
-12:                                               ; preds = %0
+15:                                               ; preds = %0
   store i32 -1, ptr %1, align 4
-  br label %18
+  br label %21
 
-13:                                               ; preds = %0
-  %14 = load ptr, ptr %5, align 8
-  %15 = call ptr @GetProcAddress(ptr noundef %14, ptr noundef @.str.2)
-  store ptr %15, ptr %4, align 8
-  %16 = load ptr, ptr %4, align 8
-  %17 = call noundef i32 %16(ptr noundef null, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, i32 noundef 0)
+16:                                               ; preds = %0
+  %17 = load ptr, ptr %6, align 8
+  %18 = call ptr @GetProcAddress(ptr noundef %17, ptr noundef @.str.2)
+  store ptr %18, ptr %5, align 8
+  %19 = load ptr, ptr %5, align 8
+  %20 = call noundef i32 %19(ptr noundef null, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, ptr noundef null, ptr noundef null, i32 noundef 0, i32 noundef 0, i32 noundef 0)
   store i32 0, ptr %1, align 4
-  br label %18
+  br label %21
 
-18:                                               ; preds = %13, %12
-  %19 = load i32, ptr %1, align 4
-  ret i32 %19
+21:                                               ; preds = %16, %15
+  %22 = load i32, ptr %1, align 4
+  ret i32 %22
 }
 
 declare dllimport ptr @LoadLibraryA(ptr noundef) #1

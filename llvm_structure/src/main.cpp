@@ -22,6 +22,7 @@ int main() {
     // Optimization check
     volatile int x = 42;
     int y = x * 2;
+    int z = y * 69;
 
     // External function check
     exampleFunction();

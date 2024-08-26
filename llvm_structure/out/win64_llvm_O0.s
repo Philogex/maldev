@@ -62,6 +62,8 @@ main:                                   # @main
 	movl	-8(%rbp), %eax
 	shll	$1, %eax
 	movl	%eax, -12(%rbp)
+	imull	$69, -12(%rbp), %eax
+	movl	%eax, -16(%rbp)
 	callq	_Z15exampleFunctionv
 	leaq	.L.str.1.2(%rip), %rcx
 	callq	*__imp_LoadLibraryA(%rip)
