@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
-project(MyPass)
+project(TestPass)
 
 list(APPEND CMAKE_MODULE_PATH "/usr/lib/llvm-16/lib/cmake/llvm") # llvm version needs to match clang and opt
 include(AddLLVM)
@@ -15,10 +15,10 @@ separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 
-add_library(MyPass SHARED MyPass.cpp)
+add_library(TestPass SHARED TestPass.cpp)
 
-# add_library(MyPass MODULE MyPass.cpp)
+# add_library(TestPass MODULE TestPass.cpp)
 
-# add_llvm_library(MyPass MODULE MyPass.cpp PLUGIN_TOOL opt) # might revert to this option later on
+# add_llvm_library(TestPass MODULE TestPass.cpp PLUGIN_TOOL opt) # might revert to this option later on
 
-# target_link_libraries(MyPass PRIVATE LLVMCore LLVMSupport) # this links into llvm directly, but we already invoke directly using opt, which would cause duplicates
+# target_link_libraries(TestPass PRIVATE LLVMCore LLVMSupport) # this links into llvm directly, but we already invoke directly using opt, which would cause duplicates

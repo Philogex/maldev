@@ -14,10 +14,10 @@ printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 ./clean.sh
 
 # Check if cmake is installed, if not, run install.sh
-if ! command -v cmake &> /dev/null; then
-    echo "CMake is not installed. Installing required packages..."
-    ./install.sh
-fi
+#if ! command -v cmake &> /dev/null; then
+#    echo "CMake is not installed. Installing required packages..."
+#    ./install.sh
+#fi
 
 # Navigate to the project build directory
 cd build
@@ -39,8 +39,9 @@ export CXX=/usr/lib/llvm-17/bin/clang
 
 printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
-# Compile "MyPass" into a shared library
-echo "Building MyPass into shared library"
+# Compile LLVM Pass into a shared library
+echo "Building Pass into shared library"
+# I might switch to `clang++ -shared -o lib.so pass.cpp -fPIC`` in the future
 cmake -G "Ninja" ../
 cmake --build .
 
@@ -50,8 +51,8 @@ cd ../../../build
 printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
 # Running custom llvm pass on project IR
-echo "Running custom llvm pipeline on project .ll ..."
-opt -load-pass-plugin=./../lib/passes/build/libMyPass.so -p my-pass -S < win64_llvm.ll > win64_llvm_transform.ll # i also just read the opt --help. god damn i love the polly options, but we are not here to optimize
+echo "Running custom llvm pipeline (\"test-pass\" specifically) on project .ll ..."
+opt -load-pass-plugin=./../lib/passes/build/libTestPass.so -p test-pass -S < win64_llvm.ll > win64_llvm_transform.ll # i also just read the opt --help. god damn i love the polly options, but we are not here to optimize
 # opt -load-pass-plugin=<other pass> -passes="<pass name>" -S < win64_llvm_transform.ll > win64_llvm_transform.ll
 echo "Finished running custom llvm pipeline on project .ll"
 
