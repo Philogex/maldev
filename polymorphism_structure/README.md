@@ -1,0 +1,2 @@
+initial idea for this was to introduce garbage control flow (again), but this time not during compile time, but rewrite control flow during each runtime. this can be further expanded on by deobfuscating instructions during runtime, not just control flow
+i would have to create some sort of structure to map equivalent control flow

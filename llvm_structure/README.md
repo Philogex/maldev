@@ -1,0 +1,2 @@
+initial idea for this was to obfuscate strings, garbage control flow injection and control flow flattening (in that order)
+it's also supposed to map regular winapi calls to direct syscalls as seen in tartarus' gate: https://github.com/trickster0/TartarusGate

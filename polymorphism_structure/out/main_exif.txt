@@ -1,0 +1,25 @@
+ExifTool Version Number         : 13.00
+File Name                       : main.exe
+Directory                       : ../out
+File Size                       : 2.4 MB
+File Modification Date/Time     : 2024:11:23 18:58:55-05:00
+File Access Date/Time           : 2024:11:23 18:58:55-05:00
+File Inode Change Date/Time     : 2024:11:23 18:58:55-05:00
+File Permissions                : -rwxr-xr-x
+File Type                       : Win64 EXE
+File Type Extension             : exe
+MIME Type                       : application/octet-stream
+Machine Type                    : AMD AMD64
+Time Stamp                      : 2024:11:23 18:58:55-05:00
+Image File Characteristics      : Executable, No line numbers, Large address aware
+PE Type                         : PE32+
+Linker Version                  : 2.43
+Code Size                       : 735744
+Initialized Data Size           : 938496
+Uninitialized Data Size         : 3584
+Entry Point                     : 0x13f0
+OS Version                      : 4.0
+Image Version                   : 0.0
+Subsystem Version               : 5.2
+Subsystem                       : Windows command line
+Warning                         : Error processing PE data dictionary

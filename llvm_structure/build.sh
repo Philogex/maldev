@@ -3,9 +3,10 @@
 length=80
 divider_character="="
 
+printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
+
 # Very important
 cat ../cat.txt
-
 
 printf '%*s\n' "$length" '' | tr ' ' "$divider_character"
 
