@@ -1,0 +1,4 @@
+/*
+func encrypt
+func decrypt
+*/

@@ -1,0 +1,4 @@
+/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles/metamorphic.dir
+/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles/post_build_commands.dir
+/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles/edit_cache.dir
+/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles/rebuild_cache.dir
