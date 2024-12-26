@@ -1,0 +1,7 @@
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/intrinsics_gen.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/omp_gen.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/acc_gen.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/RISCVTargetParserTableGen.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/TestPass.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/edit_cache.dir
+/home/kali/Desktop/maldev/llvm_structure/lib/passes/CMakeFiles/rebuild_cache.dir

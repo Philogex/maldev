@@ -14,3 +14,7 @@ func overwrite_disk_binary
 void decrypt_function(const unsigned char *encrypted, size_t size) {
     
 }
+
+void encrypt_function(const unsigned char *decrypted, size_t size) {
+    
+}
