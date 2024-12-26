@@ -15,15 +15,7 @@ extern int adj_table[MAX_NODES][MAX_NODES];
 // Declare the number of nodes in the graph
 extern int node_count;
 
-// Function declarations for nodes (they could be inlined in the main for simplicity)
-extern void node_0();
-extern void node_1();
-extern void node_2();
-extern void node_3();
-extern void node_4();
-extern void node_5();
-extern void node_6();
-extern void node_7();
-extern void node_8();
+// Function declarations for nodes
+extern void (*nodes[])(void);
 
 #endif // ADJACENCY_TABLE_H

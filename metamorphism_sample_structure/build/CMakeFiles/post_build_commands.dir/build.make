@@ -67,7 +67,7 @@ include CMakeFiles/post_build_commands.dir/compiler_depend.make
 include CMakeFiles/post_build_commands.dir/progress.make
 
 CMakeFiles/post_build_commands:
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Post-build actions like stripping, disassembling, and string extraction"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --blue --bold --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Post-build actions: stripping, disassembling, and string extraction"
 	strip /home/kali/Desktop/maldev/metamorphism_sample_structure/build/out/metamorphic.exe
 	strings /home/kali/Desktop/maldev/metamorphism_sample_structure/build/out/metamorphic.exe > /home/kali/Desktop/maldev/metamorphism_sample_structure/build/out/metamorphic_strings.txt
 	objdump -d /home/kali/Desktop/maldev/metamorphism_sample_structure/build/out/metamorphic.exe > /home/kali/Desktop/maldev/metamorphism_sample_structure/build/out/metamorphic_disasm.txt

@@ -1,4 +1,6 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o"
+  "CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o.d"
   "CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o"
   "CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o.d"
   "CMakeFiles/metamorphic.dir/src/core/cryptor.c.o"

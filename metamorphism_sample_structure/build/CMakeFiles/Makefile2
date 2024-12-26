@@ -82,12 +82,12 @@ clean: CMakeFiles/post_build_commands.dir/clean
 CMakeFiles/metamorphic.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metamorphic.dir/build.make CMakeFiles/metamorphic.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/metamorphic.dir/build.make CMakeFiles/metamorphic.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=1,2,3,4,5,6,7 "Built target metamorphic"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=1,2,3,4,5,6,7,8 "Built target metamorphic"
 .PHONY : CMakeFiles/metamorphic.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/metamorphic.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles 7
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles 8
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 CMakeFiles/metamorphic.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles 0
 .PHONY : CMakeFiles/metamorphic.dir/rule
@@ -108,7 +108,7 @@ CMakeFiles/metamorphic.dir/clean:
 CMakeFiles/post_build_commands.dir/all:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/post_build_commands.dir/build.make CMakeFiles/post_build_commands.dir/depend
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/post_build_commands.dir/build.make CMakeFiles/post_build_commands.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=8 "Built target post_build_commands"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=9 "Built target post_build_commands"
 .PHONY : CMakeFiles/post_build_commands.dir/all
 
 # Build rule for subdir invocation for target.

@@ -142,6 +142,30 @@ post_build_commands/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/post_build_commands.dir/build.make CMakeFiles/post_build_commands.dir/build
 .PHONY : post_build_commands/fast
 
+src/core/c2_handler.o: src/core/c2_handler.c.o
+.PHONY : src/core/c2_handler.o
+
+# target to build an object file
+src/core/c2_handler.c.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metamorphic.dir/build.make CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o
+.PHONY : src/core/c2_handler.c.o
+
+src/core/c2_handler.i: src/core/c2_handler.c.i
+.PHONY : src/core/c2_handler.i
+
+# target to preprocess a source file
+src/core/c2_handler.c.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metamorphic.dir/build.make CMakeFiles/metamorphic.dir/src/core/c2_handler.c.i
+.PHONY : src/core/c2_handler.c.i
+
+src/core/c2_handler.s: src/core/c2_handler.c.s
+.PHONY : src/core/c2_handler.s
+
+# target to generate assembly for a file
+src/core/c2_handler.c.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/metamorphic.dir/build.make CMakeFiles/metamorphic.dir/src/core/c2_handler.c.s
+.PHONY : src/core/c2_handler.c.s
+
 src/core/control_flow_handler.o: src/core/control_flow_handler.c.o
 .PHONY : src/core/control_flow_handler.o
 
@@ -296,6 +320,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... post_build_commands"
 	@echo "... metamorphic"
+	@echo "... src/core/c2_handler.o"
+	@echo "... src/core/c2_handler.i"
+	@echo "... src/core/c2_handler.s"
 	@echo "... src/core/control_flow_handler.o"
 	@echo "... src/core/control_flow_handler.i"
 	@echo "... src/core/control_flow_handler.s"

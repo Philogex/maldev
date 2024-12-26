@@ -8,6 +8,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 
 # The set of dependency files which are needed:
 set(CMAKE_DEPENDS_DEPENDENCY_FILES
+  "/home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/c2_handler.c" "CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o" "gcc" "CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o.d"
   "/home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c" "CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o" "gcc" "CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o.d"
   "/home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c" "CMakeFiles/metamorphic.dir/src/core/cryptor.c.o" "gcc" "CMakeFiles/metamorphic.dir/src/core/cryptor.c.o.d"
   "/home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c" "CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o" "gcc" "CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o.d"

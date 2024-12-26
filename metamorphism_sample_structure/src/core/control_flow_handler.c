@@ -88,6 +88,8 @@ void execute_graph(int start_node, int max_depth, int current_depth, int adj_mat
             
             // if (current_depth == 0)
             printf("Executing node: %d at Depth %d\n", current, current_depth);
+            // Execute current node
+            nodes[current]();
 
             // Add neighbors to the queue
             for (int neighbor = 0; neighbor < node_count; neighbor++) {

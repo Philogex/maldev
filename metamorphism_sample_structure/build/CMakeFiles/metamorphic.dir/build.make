@@ -73,89 +73,104 @@ CMakeFiles/metamorphic.dir/src/core/main.c.o: CMakeFiles/metamorphic.dir/flags.m
 CMakeFiles/metamorphic.dir/src/core/main.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c
 CMakeFiles/metamorphic.dir/src/core/main.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building C object CMakeFiles/metamorphic.dir/src/core/main.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/main.c.o -MF CMakeFiles/metamorphic.dir/src/core/main.c.o.d -o CMakeFiles/metamorphic.dir/src/core/main.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/main.c.o -MF CMakeFiles/metamorphic.dir/src/core/main.c.o.d -o CMakeFiles/metamorphic.dir/src/core/main.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c
 
 CMakeFiles/metamorphic.dir/src/core/main.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/core/main.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c > CMakeFiles/metamorphic.dir/src/core/main.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c > CMakeFiles/metamorphic.dir/src/core/main.c.i
 
 CMakeFiles/metamorphic.dir/src/core/main.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/core/main.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c -o CMakeFiles/metamorphic.dir/src/core/main.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/main.c -o CMakeFiles/metamorphic.dir/src/core/main.c.s
+
+CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o: CMakeFiles/metamorphic.dir/flags.make
+CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/c2_handler.c
+CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o -MF CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o.d -o CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/c2_handler.c
+
+CMakeFiles/metamorphic.dir/src/core/c2_handler.c.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/core/c2_handler.c.i"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/c2_handler.c > CMakeFiles/metamorphic.dir/src/core/c2_handler.c.i
+
+CMakeFiles/metamorphic.dir/src/core/c2_handler.c.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/core/c2_handler.c.s"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/c2_handler.c -o CMakeFiles/metamorphic.dir/src/core/c2_handler.c.s
 
 CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o: CMakeFiles/metamorphic.dir/flags.make
 CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c
 CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building C object CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o -MF CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o.d -o CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o -MF CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o.d -o CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c
 
 CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c > CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c > CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.i
 
 CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c -o CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/control_flow_handler.c -o CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.s
 
 CMakeFiles/metamorphic.dir/src/core/cryptor.c.o: CMakeFiles/metamorphic.dir/flags.make
 CMakeFiles/metamorphic.dir/src/core/cryptor.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c
 CMakeFiles/metamorphic.dir/src/core/cryptor.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building C object CMakeFiles/metamorphic.dir/src/core/cryptor.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/cryptor.c.o -MF CMakeFiles/metamorphic.dir/src/core/cryptor.c.o.d -o CMakeFiles/metamorphic.dir/src/core/cryptor.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/metamorphic.dir/src/core/cryptor.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/cryptor.c.o -MF CMakeFiles/metamorphic.dir/src/core/cryptor.c.o.d -o CMakeFiles/metamorphic.dir/src/core/cryptor.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c
 
 CMakeFiles/metamorphic.dir/src/core/cryptor.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/core/cryptor.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c > CMakeFiles/metamorphic.dir/src/core/cryptor.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c > CMakeFiles/metamorphic.dir/src/core/cryptor.c.i
 
 CMakeFiles/metamorphic.dir/src/core/cryptor.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/core/cryptor.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c -o CMakeFiles/metamorphic.dir/src/core/cryptor.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/cryptor.c -o CMakeFiles/metamorphic.dir/src/core/cryptor.c.s
 
 CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o: CMakeFiles/metamorphic.dir/flags.make
 CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c
 CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building C object CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o -MF CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o.d -o CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o -MF CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o.d -o CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c
 
 CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c > CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c > CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.i
 
 CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c -o CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/core/instruction_substitutor.c -o CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.s
 
 CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o: CMakeFiles/metamorphic.dir/flags.make
 CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c
 CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building C object CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o -MF CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o.d -o CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o -MF CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o.d -o CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c
 
 CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c > CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c > CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.i
 
 CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c -o CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/adjacency_table.c -o CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.s
 
 CMakeFiles/metamorphic.dir/src/data/config.c.o: CMakeFiles/metamorphic.dir/flags.make
 CMakeFiles/metamorphic.dir/src/data/config.c.o: /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c
 CMakeFiles/metamorphic.dir/src/data/config.c.o: CMakeFiles/metamorphic.dir/compiler_depend.ts
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building C object CMakeFiles/metamorphic.dir/src/data/config.c.o"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/data/config.c.o -MF CMakeFiles/metamorphic.dir/src/data/config.c.o.d -o CMakeFiles/metamorphic.dir/src/data/config.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building C object CMakeFiles/metamorphic.dir/src/data/config.c.o"
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -MD -MT CMakeFiles/metamorphic.dir/src/data/config.c.o -MF CMakeFiles/metamorphic.dir/src/data/config.c.o.d -o CMakeFiles/metamorphic.dir/src/data/config.c.o -c /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c
 
 CMakeFiles/metamorphic.dir/src/data/config.c.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Preprocessing C source to CMakeFiles/metamorphic.dir/src/data/config.c.i"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c > CMakeFiles/metamorphic.dir/src/data/config.c.i
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -E /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c > CMakeFiles/metamorphic.dir/src/data/config.c.i
 
 CMakeFiles/metamorphic.dir/src/data/config.c.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green "Compiling C source to assembly CMakeFiles/metamorphic.dir/src/data/config.c.s"
-	/usr/bin/x86_64-w64-mingw32-gcc $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c -o CMakeFiles/metamorphic.dir/src/data/config.c.s
+	clang $(C_DEFINES) $(C_INCLUDES) $(C_FLAGS) -S /home/kali/Desktop/maldev/metamorphism_sample_structure/src/data/config.c -o CMakeFiles/metamorphic.dir/src/data/config.c.s
 
 # Object files for target metamorphic
 metamorphic_OBJECTS = \
 "CMakeFiles/metamorphic.dir/src/core/main.c.o" \
+"CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o" \
 "CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o" \
 "CMakeFiles/metamorphic.dir/src/core/cryptor.c.o" \
 "CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o" \
@@ -166,6 +181,7 @@ metamorphic_OBJECTS = \
 metamorphic_EXTERNAL_OBJECTS =
 
 out/metamorphic: CMakeFiles/metamorphic.dir/src/core/main.c.o
+out/metamorphic: CMakeFiles/metamorphic.dir/src/core/c2_handler.c.o
 out/metamorphic: CMakeFiles/metamorphic.dir/src/core/control_flow_handler.c.o
 out/metamorphic: CMakeFiles/metamorphic.dir/src/core/cryptor.c.o
 out/metamorphic: CMakeFiles/metamorphic.dir/src/core/instruction_substitutor.c.o
@@ -173,7 +189,7 @@ out/metamorphic: CMakeFiles/metamorphic.dir/src/data/adjacency_table.c.o
 out/metamorphic: CMakeFiles/metamorphic.dir/src/data/config.c.o
 out/metamorphic: CMakeFiles/metamorphic.dir/build.make
 out/metamorphic: CMakeFiles/metamorphic.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking C executable out/metamorphic"
+	@$(CMAKE_COMMAND) -E cmake_echo_color "--switch=$(COLOR)" --green --bold --progress-dir=/home/kali/Desktop/maldev/metamorphism_sample_structure/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking C executable out/metamorphic"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/metamorphic.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

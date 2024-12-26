@@ -19,17 +19,15 @@ func main
 #include <stdio.h>
 #include <stdlib.h>
 #include "control_flow_handler.h"
+#include "cryptor.h"
 #include "../data/adjacency_table.h"
 
 int main() {
-    // Step 1: Print a banner (optional, for visual clarity)
-    printf("=== Graph Execution Proof of Concept ===\n");
+    //printf("Decrypt all functions\n"); //location might change to control_flow_handler
+    //decrypt_function(node, sizeof(node));
 
-    // Step 3: Execute the graph starting from Node 0, with a depth limit of 3
     printf("Executing graph from Node 0 with max depth of 3:\n");
     execute_graph(0, 2, 0, adj_table);
 
-    // Step 4: Clean exit
-    printf("=== Execution Complete ===\n");
     return 0;
 }

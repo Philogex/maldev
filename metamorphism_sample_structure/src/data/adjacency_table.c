@@ -10,7 +10,7 @@ int adj_table[MAX_NODES][MAX_NODES] = {
 int node_count = MAX_NODES;
 
 // Define the functions for each node
-void node_0() {
+void node_0() __attribute__((annotate("encrypt"))) {
     printf("Hello from Node 0!\n");
 }
 
@@ -45,3 +45,5 @@ void node_7() {
 void node_8() {
     printf("Hello from Node 8!\n");
 }
+
+void (*nodes[])(void) = {node_0, node_1, node_2, node_3, node_4, node_5, node_6, node_7, node_8};
