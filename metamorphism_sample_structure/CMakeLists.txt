@@ -1,11 +1,10 @@
 cmake_minimum_required(VERSION 3.15)
-project(Metamorphic C)
+project(Metamorphic)
 
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Specify Clang compilers
 set(CMAKE_C_COMPILER "clang-16")
-set(CMAKE_CXX_COMPILER "clang++-16")
 
 # Set target system and architecture
 set(CMAKE_SYSTEM_NAME Windows)
@@ -13,20 +12,31 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
 # Specify Clang flags to target Windows (MinGW-w64)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --target=x86_64-w64-mingw32")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} --target=x86_64-w64-mingw32")
 set(CMAKE_EXE_LINKER_FLAGS "-static")
 
-# Include MinGW headers and libraries
-include_directories(
-    /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/x86_64-w64-mingw32/
-    /usr/lib/gcc/x86_64-w64-mingw32/13-win32/include/c++/
-    /usr/x86_64-w64-mingw32/include/
-)
+# Add Correct LLVM Version to CMake Module Path
+list(APPEND CMAKE_MODULE_PATH "/usr/lib/llvm-16/lib/cmake/llvm") # llvm version needs to match clang and opt
+include(AddLLVM)
 
-link_directories(
-    /usr/lib/gcc/x86_64-w64-mingw32/13-win32/
-    /usr/x86_64-w64-mingw32/lib/
-)
+# Set policy CMP0075 to NEW to handle include file checks as per CMake 3.11 and above
+if(POLICY CMP0075)
+  cmake_policy(SET CMP0075 NEW)
+endif()
+
+# Import LLVM 16 Config
+find_package(LLVM 16 REQUIRED CONFIG)
+
+# Create shared library for LLVM pass
+add_library(encryption_pass SHARED lib/encryption_pass.cpp)
+
+# Set the correct linker language (C++ for the pass)
+set_target_properties(encryption_pass PROPERTIES LINKER_LANGUAGE CXX)
+
+# Target-specific include directories for encryption_pass
+target_include_directories(encryption_pass PRIVATE ${LLVM_INCLUDE_DIRS})
+
+# Add LLVM 16 Config Definitions to CMake
+target_compile_definitions(encryption_pass PRIVATE ${LLVM_DEFINITIONS})
 
 # Source files
 set(SOURCE_FILES
@@ -46,6 +56,26 @@ set(SOURCE_FILES
     src/crypto/rsa.h
 )
 
+# Output executable
+add_executable(metamorphic ${SOURCE_FILES})
+
+# Output directory and Linked Language
+set_target_properties(metamorphic PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
+    LINKER_LANGUAGE C
+)
+
+# Include MinGW headers
+target_include_directories(metamorphic
+    PRIVATE /usr/x86_64-w64-mingw32/include/
+)
+
+# Link MinGW libraries
+target_link_directories(metamorphic
+    PRIVATE /usr/lib/gcc/x86_64-w64-mingw32/13-win32/
+    PRIVATE /usr/x86_64-w64-mingw32/lib/
+)
+
 # Compile sources into LLVM bitcode
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/main.bc
@@ -53,29 +83,6 @@ add_custom_command(
             ${SOURCE_FILES} --target=x86_64-w64-mingw32 -I/usr/x86_64-w64-mingw32/include/
     COMMENT "Generating LLVM bitcode for main sources"
 )
-
-# Add Correct LLVM Version to CMake Module Path
-list(APPEND CMAKE_MODULE_PATH "/usr/lib/llvm-16/lib/cmake/llvm") # llvm version needs to match clang and opt
-include(AddLLVM)
-
-# Set policy CMP0075 to NEW to handle include file checks as per CMake 3.11 and above
-if(POLICY CMP0075)
-  cmake_policy(SET CMP0075 NEW)
-endif()
-
-# Import LLVM 16 Config
-find_package(LLVM 16 REQUIRED CONFIG)
-
-# Add LLVM 16 Config Definitions to CMake
-separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
-add_definitions(${LLVM_DEFINITIONS})
-include_directories(${LLVM_INCLUDE_DIRS})
-
-# Create shared library for LLVM pass
-add_library(encryption_pass SHARED lib/encryption_pass.cpp)
-
-# Set the correct linker language (C++ for the pass)
-set_target_properties(encryption_pass PROPERTIES LINKER_LANGUAGE CXX)
 
 # Apply the encryption_pass shared library on the bitcode
 add_custom_command(
@@ -98,14 +105,6 @@ add_custom_target(
     run_encryption_pass
     DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
     COMMENT "Pipeline: Generate Bitcode -> Apply Pass -> Produce Executable"
-)
-
-# Output executable
-add_executable(metamorphic ${SOURCE_FILES})
-
-# Output directory
-set_target_properties(metamorphic PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
 )
 
 # Post-build commands
