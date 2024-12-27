@@ -89,6 +89,7 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/main_pass.bc
     COMMAND opt -load ${CMAKE_BINARY_DIR}/libencryption_pass.so -encryption-pass
             -o ${CMAKE_BINARY_DIR}/out/main_pass.bc ${CMAKE_BINARY_DIR}/out/main.bc
+    DEPENDS ${CMAKE_BINARY_DIR}/out/main.bc ${CMAKE_BINARY_DIR}/libencryption_pass.so
     COMMENT "Running the encryption_pass on LLVM bitcode"
 )
 
@@ -97,20 +98,26 @@ add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic.exe
     COMMAND clang -o ${CMAKE_BINARY_DIR}/out/metamorphic.exe
             ${CMAKE_BINARY_DIR}/out/main_pass.bc --target=x86_64-w64-mingw32 -static
+    DEPENDS ${CMAKE_BINARY_DIR}/out/main_pass.bc
     COMMENT "Linking final executable from transformed LLVM bitcode"
 )
 
-# Add a custom target to trigger the whole pipeline
-add_custom_target(
-    run_encryption_pass
-    DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
-    COMMENT "Pipeline: Generate Bitcode -> Apply Pass -> Produce Executable"
-)
+# Add dependencies between the executable and custom commands
+# Link the custom commands to a dummy target
+add_custom_target(generate_bitcode DEPENDS ${CMAKE_BINARY_DIR}/out/main.bc)
+add_custom_target(apply_pass DEPENDS ${CMAKE_BINARY_DIR}/out/main_pass.bc)
+add_custom_target(link_executable)
 
-# Post-build commands
+# Post-build actions after building the executable
 add_custom_target(post_build_commands
     COMMAND strip ${CMAKE_BINARY_DIR}/out/metamorphic.exe
     COMMAND strings ${CMAKE_BINARY_DIR}/out/metamorphic.exe > ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
     COMMAND objdump -d ${CMAKE_BINARY_DIR}/out/metamorphic.exe > ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
     COMMENT "Post-build actions: stripping, disassembling, and string extraction"
 )
+
+# Set the build order: make sure the executable is generated after the bitcode and pass application
+add_dependencies(metamorphic generate_bitcode apply_pass link_executable)
+
+# Ensure post-build actions are triggered after the executable is created
+add_dependencies(post_build_commands metamorphic)
