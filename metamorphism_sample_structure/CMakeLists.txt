@@ -73,13 +73,22 @@ add_custom_command(
     COMMENT "Linking LLVM bitcode files"
 )
 
+add_custom_target(linking ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/out/program.bc
+)
+
 # Apply the encryption_pass shared library on the bitcode
 add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/out/main_pass.bc
+    OUTPUT ${CMAKE_BINARY_DIR}/out/main_pass.bc ${CMAKE_BINARY_DIR}/out/pass_output.txt
     COMMAND opt -load-pass-plugin=${CMAKE_BINARY_DIR}/libencryption_pass.so -p encryption-pass
             -o ${CMAKE_BINARY_DIR}/out/main_pass.bc ${CMAKE_BINARY_DIR}/out/program.bc
+            2>&1 | tee ${CMAKE_BINARY_DIR}/out/pass_output.txt
     DEPENDS ${CMAKE_BINARY_DIR}/out/program.bc ${CMAKE_BINARY_DIR}/libencryption_pass.so
     COMMENT "Running the encryption_pass on LLVM bitcode"
+)
+
+add_custom_target(optimizing ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/out/main_pass.bc
 )
 
 # Output executable
@@ -92,21 +101,55 @@ add_custom_command(
     COMMENT "Linking final executable from transformed LLVM bitcode"
 )
 
-add_custom_target(metamorphic ALL
+add_custom_target(executable ALL
     DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
 )
 
 # Output directory and Linked Language
-set_target_properties(metamorphic PROPERTIES
+set_target_properties(executable PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
     LINKER_LANGUAGE C
 )
 
-# Post-build actions after building the executable
-add_custom_target(post_build_commands ALL
-    COMMAND strip ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+### Post Build ###
+
+# Custom command to extract strings
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
     COMMAND strings ${CMAKE_BINARY_DIR}/out/metamorphic.exe > ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
-    COMMAND objdump -d ${CMAKE_BINARY_DIR}/out/metamorphic.exe > ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
-    COMMENT "Post-build actions: stripping, disassembling, and string extraction"
+    COMMENT "Extracting strings from metamorphic.exe"
     DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+)
+
+# Custom command to generate disassembly
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
+    COMMAND objdump -d ${CMAKE_BINARY_DIR}/out/metamorphic.exe > ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
+    COMMENT "Generating disassembly of metamorphic.exe"
+    DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+)
+
+# Custom command to strip the executable
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
+    COMMAND strip ${CMAKE_BINARY_DIR}/out/metamorphic.exe -o ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
+    COMMENT "Stripping metamorphic.exe"
+    DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+)
+
+# Custom command to generate IR of the Bitcode
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
+    COMMAND llvm-dis ${CMAKE_BINARY_DIR}/out/main_pass.bc -o ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
+    COMMENT "Generating IR for metamorphic.exe"
+    DEPENDS ${CMAKE_BINARY_DIR}/out/main_pass.bc
+)
+
+# Custom target to group all post-build commands
+add_custom_target(post_build_commands ALL
+    DEPENDS 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
+        ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
+        ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
 )
