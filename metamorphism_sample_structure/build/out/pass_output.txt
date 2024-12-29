@@ -1,0 +1,10 @@
+Found annotated function: node_0 with annotation: encrypt
+Found annotated function: node_1 with annotation: encrypt
+Found annotated function: node_2 with annotation: encrypt
+Found annotated function: node_3 with annotation: encrypt
+Found annotated function: node_4 with annotation: encrypt
+Found annotated function: node_5 with annotation: encrypt
+Found annotated function: node_6 with annotation: encrypt
+Found annotated function: node_7 with annotation: encrypt
+Found annotated function: node_8 with annotation: encrypt
+Target machine instantiated for target: x86_64-w64-mingw32

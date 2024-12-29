@@ -11,8 +11,10 @@ func main
 
 	loop parse_incoming_command
 	loop keep_alive
+	loop check_for_exit_state
 
 	encrypt_control_flow
+	instruction_substitutor
 	overwrite_disk_binary
 */
 
