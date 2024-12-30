@@ -2,7 +2,7 @@
 #include "llvm/Passes/PassBuilder.h"
 #include "llvm/Passes/PassPlugin.h"
 #include "llvm/TargetParser/TargetParser.h"
-#include "llvm/Analysis/TargetTransformInfo.h"  // Corrected include
+#include "llvm/Analysis/TargetTransformInfo.h"
 #include "llvm/IR/Function.h"
 #include "llvm/Target/TargetMachine.h"
 #include "llvm/IR/Module.h"
@@ -64,45 +64,9 @@ namespace {
         }
     }
 
-    void instantiateTargetMachine(Module &M) {
-        // Initialize the target machine for the current architecture
-        std::string TargetTriple = "x86_64-w64-mingw32";
-        std::string Error;
-        const Target *TheTarget = TargetRegistry::lookupTarget(TargetTriple, Error);
-        if (!TheTarget) {
-            errs() << "Error: " << Error << "\n";
-            return;
-        }
-
-        TargetOptions Options;
-        
-        // Create a TargetMachine using std::move to manage the pointer properly
-        std::unique_ptr<TargetMachine> Target(
-            TheTarget->createTargetMachine(
-                TargetTriple,           // Target triple (e.g., x86_64-linux-gnu)
-                "generic",              // CPU name (you can specify your target CPU here)
-                "",                     // Features (optional, can be left empty)
-                Options,                // Target options
-                std::nullopt,           // Relocation model (optional, set to std::nullopt)
-                std::nullopt,           // Code model (optional, set to std::nullopt)
-                CodeGenOpt::Default,    // Code generation optimization level
-                false                   // JIT (Just-In-Time compilation) flag (false for regular compilation)
-            )
-        );
-
-        if (!Target) {
-            errs() << "Error: Could not create TargetMachine\n";
-            return;
-        }
-
-        // Target machine has been instantiated, but no further actions are taken here.
-        errs() << "Target machine instantiated for target: " << TargetTriple << "\n";
-    }
-
     struct EncryptionPass : PassInfoMixin<EncryptionPass> {
         PreservedAnalyses run(Module &M, ModuleAnalysisManager &) {
             findAnnotatedFunctions(M);
-            instantiateTargetMachine(M); // Just instantiate the target machine
 
             return PreservedAnalyses::all();
         }

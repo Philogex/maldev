@@ -1,10 +1,12 @@
 cmake_minimum_required(VERSION 3.15)
+
 project(Metamorphic)
 
 # set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # Specify Clang compilers
 set(CMAKE_C_COMPILER "clang-16")
+set(CMAKE_CXX_COMPILER "clang++-16")
 
 # Set target system and architecture
 set(CMAKE_SYSTEM_NAME Windows)
@@ -12,7 +14,6 @@ set(CMAKE_SYSTEM_PROCESSOR x86_64)
 
 # Specify Clang flags to target Windows (MinGW-w64)
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} --target=x86_64-w64-mingw32")
-set(CMAKE_EXE_LINKER_FLAGS "-static")
 
 # Add Correct LLVM Version to CMake Module Path
 list(APPEND CMAKE_MODULE_PATH "/usr/lib/llvm-16/lib/cmake/llvm") # llvm version needs to match clang and opt
@@ -27,7 +28,7 @@ endif()
 find_package(LLVM 16 REQUIRED CONFIG)
 
 # Create shared library for LLVM pass
-add_library(encryption_pass SHARED lib/encryption_pass.cpp)
+add_library(encryption_pass SHARED ${CMAKE_SOURCE_DIR}/lib/passes/encryption_pass.cpp)
 
 # Set the correct linker language (C++ for the pass)
 set_target_properties(encryption_pass PROPERTIES LINKER_LANGUAGE CXX)
@@ -37,6 +38,58 @@ target_include_directories(encryption_pass PRIVATE ${LLVM_INCLUDE_DIRS})
 
 # Add LLVM 16 Config Definitions to CMake
 target_compile_definitions(encryption_pass PRIVATE ${LLVM_DEFINITIONS})
+
+# Generate post-processing executable function_encrypter
+add_executable(function_encrypter ${CMAKE_SOURCE_DIR}/lib/utils/function_encrypter.cpp)
+
+# Set the correct linker language (C++ for the executable)
+set_target_properties(function_encrypter PROPERTIES 
+    LINKER_LANGUAGE CXX
+)
+
+# Specify the output directory for the executable
+set_target_properties(function_encrypter PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
+)
+
+# Set the linker flags for function_encrypter
+target_link_options(function_encrypter PRIVATE 
+    ""
+)
+
+# Include LLVM directories
+target_include_directories(function_encrypter PRIVATE ${LLVM_INCLUDE_DIRS})
+
+# Add LLVM 16 Config Definitions to CMake
+target_compile_definitions(function_encrypter PRIVATE ${LLVM_DEFINITIONS})
+
+# Get the output from llvm-config for flags and libraries
+execute_process(
+    COMMAND llvm-config --cxxflags
+    OUTPUT_VARIABLE LLVM_CXXFLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND llvm-config --libs all
+    OUTPUT_VARIABLE LLVM_LIBS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+execute_process(
+    COMMAND llvm-config --ldflags
+    OUTPUT_VARIABLE LLVM_LDFLAGS
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+
+# Add compiler flags
+target_compile_options(function_encrypter PRIVATE ${LLVM_CXXFLAGS})
+
+# Add linker flags
+target_link_options(function_encrypter PRIVATE ${LLVM_LDFLAGS})
+
+# Link the libraries required for linking
+target_link_libraries(function_encrypter PRIVATE ${LLVM_LIBS})
 
 # Source files
 file(GLOB SOURCE_FILES
@@ -111,8 +164,6 @@ set_target_properties(executable PROPERTIES
     LINKER_LANGUAGE C
 )
 
-### Post Build ###
-
 # Custom command to extract strings
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
@@ -148,8 +199,40 @@ add_custom_command(
 # Custom target to group all post-build commands
 add_custom_target(post_build_commands ALL
     DEPENDS 
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt 
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_disasm.txt
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
+        ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
+        ${CMAKE_SOURCE_DIR}/out/function_encrypter
+)
+
+# List of files to copy to the output directory
+set(INPUT_FILES
+    ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+    ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
+    ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
+    ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
+    ${CMAKE_BINARY_DIR}/out/function_encrypter
+    ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
+)
+
+# Custom command to copy all output files to a new location (e.g., ../out/)
+add_custom_command(
+    OUTPUT 
+        ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_disasm.txt
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt
+        ${CMAKE_SOURCE_DIR}/out/function_encrypter
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
+    COMMAND ${CMAKE_COMMAND} -E copy ${INPUT_FILES} ${CMAKE_SOURCE_DIR}/out/
+    COMMENT "Copying files to the final output directory"
+    DEPENDS 
         ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt 
         ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
         ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
+        ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+        ${CMAKE_BINARY_DIR}/out/function_encrypter
 )
