@@ -6,6 +6,7 @@
 #include "llvm/Support/InitLLVM.h"
 #include "llvm/Support/raw_ostream.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Object/COFF.h"
 #include <algorithm>
 #include <iostream>
 #include <vector>
@@ -20,6 +21,10 @@ struct FunctionSymbol {
     FunctionSymbol(uint64_t addr, StringRef n) : address(addr), name(n) {}
 };
 
+uint64_t getPEBaseAddress(const COFFObjectFile *PEObj) {
+    // Get the ImageBase from the Optional Header
+    return PEObj->getImageBase();
+}
 
 void analyzeExecutable(StringRef FilePath) {
     Expected<OwningBinary<Binary>> BinaryOrErr = createBinary(FilePath);
@@ -29,8 +34,71 @@ void analyzeExecutable(StringRef FilePath) {
     }
 
     Binary &Binary = *BinaryOrErr.get().getBinary();
+
+    // following two are unused, but might be helpful later on
+    uint64_t baseAddress = 0;
+    uint64_t textBaseAddress = 0;
+
+    // Check if the binary is a PE file
+    if (const COFFObjectFile *PEObj = dyn_cast<COFFObjectFile>(&Binary)) {
+        baseAddress = getPEBaseAddress(PEObj);
+        // Iterate over all sections in the PE file
+        for (const SectionRef &Section : PEObj->sections()) {
+            Expected<StringRef> SectionNameOrErr = Section.getName();  // Get section name
+            if (!SectionNameOrErr) {
+                errs() << "Error: " << toString(SectionNameOrErr.takeError()) << "\n";
+                continue;
+            }
+
+            StringRef SectionName = *SectionNameOrErr;
+
+            // Check if the section is the .text section (which contains the executable code)
+            if (SectionName == ".text") {
+                // Get the base address of the .text section
+                textBaseAddress = Section.getAddress();
+                outs() << "Text Section Base Address: 0x" << Twine::utohexstr(textBaseAddress) << "\n";
+                break;  // No need to continue after finding the .text section
+            }
+        }
+
+        // If we didn't find the .text section, print an error
+        if (textBaseAddress == 0) {
+            errs() << "Error: .text section not found!\n";
+        }
+    } else {
+        errs() << "Error: Not a PE binary!\n";
+    }
+
     if (ObjectFile *Obj = dyn_cast<ObjectFile>(&Binary)) {
         SmallVector<FunctionSymbol, 64> FunctionSymbols;
+
+        // Extract symbols from the object file
+        /* unused again, but might be helpful later. this will get replaced by metadata search anyways, so no need to implement
+        for (const SymbolRef &Symbol : Obj->symbols()) {
+            Expected<uint64_t> AddressOrErr = Symbol.getAddress();
+            if (!AddressOrErr) {
+                errs() << "Error: " << toString(AddressOrErr.takeError()) << "\n";
+                continue;
+            }
+
+            uint64_t Address = *AddressOrErr;
+
+            Expected<StringRef> NameOrErr = Symbol.getName();
+            if (!NameOrErr) {
+                errs() << "Error: " << toString(NameOrErr.takeError()) << "\n";
+                continue;
+            }
+
+            StringRef Name = *NameOrErr;
+
+            // Filter out symbols
+            if (!Name.contains("node")) {
+                continue;
+            }
+
+            FunctionSymbols.push_back(FunctionSymbol(Address, Name));
+        }
+        */
 
         // Extract symbols from the object file
         for (const SymbolRef &Symbol : Obj->symbols()) {
@@ -64,7 +132,7 @@ void analyzeExecutable(StringRef FilePath) {
         for (size_t i = 0; i < FunctionSymbols.size() - 1; ++i) {
             uint64_t func_size = FunctionSymbols[i + 1].address - FunctionSymbols[i].address;
             outs() << "Function: " << FunctionSymbols[i].name
-                   << " Address: " << FunctionSymbols[i].address
+                   << " Address: " << Twine::utohexstr(FunctionSymbols[i].address)
                    << " Size: " << func_size << " bytes\n";
         }
 

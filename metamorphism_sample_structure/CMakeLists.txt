@@ -133,7 +133,7 @@ add_custom_target(linking ALL
 # Apply the encryption_pass shared library on the bitcode
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/main_pass.bc ${CMAKE_BINARY_DIR}/out/pass_output.txt
-    COMMAND opt -load-pass-plugin=${CMAKE_BINARY_DIR}/libencryption_pass.so -p encryption-pass
+    COMMAND opt -load-pass-plugin=${CMAKE_BINARY_DIR}/libencryption_pass.so -passes='encryption-pass'
             -o ${CMAKE_BINARY_DIR}/out/main_pass.bc ${CMAKE_BINARY_DIR}/out/program.bc
             2>&1 | tee ${CMAKE_BINARY_DIR}/out/pass_output.txt
     DEPENDS ${CMAKE_BINARY_DIR}/out/program.bc ${CMAKE_BINARY_DIR}/libencryption_pass.so
