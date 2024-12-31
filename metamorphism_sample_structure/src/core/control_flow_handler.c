@@ -42,7 +42,7 @@ void reorder_edges(int (*adj_matrix)[MAX_NODES][MAX_NODES]) {
         connected[unconnected_node] = 1;
         connected_count++;
 
-        printf("Connected node %d to node %d\n", unconnected_node, connected_node);
+        //printf("Connected node %d to node %d\n", unconnected_node, connected_node);
     }
 }
 
@@ -59,7 +59,7 @@ void print_adj_table(int adj_table[MAX_NODES][MAX_NODES]) {
 
 // Example of graph traversal to test the connectivity
 void execute_graph(int start_node, int max_depth, int current_depth, int adj_matrix[MAX_NODES][MAX_NODES]) {
-    printf("Reordering Local Edges for Depth: %d\n", current_depth);
+    // printf("Reordering Local Edges for Depth: %d\n", current_depth);
     reorder_edges(&adj_table);
     int *queue = malloc(sizeof(int) * node_count);
     if (!queue) {
@@ -82,12 +82,12 @@ void execute_graph(int start_node, int max_depth, int current_depth, int adj_mat
             int current = queue[front++];
 
             if (rand() % 2 == 0 && current_depth < max_depth) { // 50% chance to recurse deeper
-                printf("Recursively calling execute_graph from node %d at depth %d\n", start_node, current_depth);
+                // printf("Recursively calling execute_graph from node %d at depth %d\n", start_node, current_depth);
                 execute_graph(current, max_depth, current_depth + 1, adj_matrix);
             }
             
             // if (current_depth == 0)
-            printf("Executing node: %d at Depth %d\n", current, current_depth);
+            // printf("Executing node: %d at Depth %d\n", current, current_depth);
             // Execute current node
             nodes[current]();
 
