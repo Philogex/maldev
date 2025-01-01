@@ -1,5 +1,3 @@
-// To be run on the outputted Object file during compilation
-
 #include "llvm/Object/ObjectFile.h"
 #include "llvm/Object/SymbolSize.h"
 #include "llvm/Support/TargetSelect.h"
@@ -15,19 +13,30 @@
 #include <algorithm>
 #include <iostream>
 #include <fstream>
+#include <sstream>
 #include <vector>
+#include <cstring>
 #include <string>
+#include <iomanip>
 
 using namespace llvm;
 using namespace llvm::object;
 
+struct FunctionInfo {
+    uint64_t physicalAddress;
+    uint64_t size;
+    char name[64];  // Fixed-size array for C compatibility
 
+    FunctionInfo(uint64_t addr, uint64_t sz, const char* n) : physicalAddress(addr), size(sz) {
+        strncpy(name, n, sizeof(name) - 1);
+        name[sizeof(name) - 1] = '\0';  // Ensure null termination
+    }
+};
 
 uint64_t getPEBaseAddress(const COFFObjectFile *PEObj) {
     // Get the ImageBase from the Optional Header
     outs() << "PE Base Address: 0x" << Twine::utohexstr(PEObj->getImageBase()) << "\n";
     return PEObj->getImageBase();
-
 }
 
 uint64_t getTextSectionAddress(const COFFObjectFile *PEObj) {
@@ -42,7 +51,26 @@ uint64_t getTextSectionAddress(const COFFObjectFile *PEObj) {
         StringRef SectionName = *SectionNameOrErr;
         if (SectionName == ".text") {
             textBaseAddress = Section.getAddress();
-            outs() << "Text Section Base Address: 0x" << Twine::utohexstr(textBaseAddress) << "\n";
+            outs() << ".text Section Base Address: 0x" << Twine::utohexstr(textBaseAddress) << "\n";
+            break;
+        }
+    }
+    return textBaseAddress;
+}
+
+uint64_t getMetaSectionAddress(const COFFObjectFile *PEObj) {
+    uint64_t textBaseAddress = 0;
+    for (const SectionRef &Section : PEObj->sections()) {
+        Expected<StringRef> SectionNameOrErr = Section.getName();
+        if (!SectionNameOrErr) {
+            errs() << "Error: " << toString(SectionNameOrErr.takeError()) << "\n";
+            continue;
+        }
+
+        StringRef SectionName = *SectionNameOrErr;
+        if (SectionName == ".meta") {
+            textBaseAddress = Section.getAddress();
+            outs() << ".meta Section Base Address: 0x" << Twine::utohexstr(textBaseAddress) << "\n";
             break;
         }
     }
@@ -61,20 +89,12 @@ uint64_t getTextSectionSize(const COFFObjectFile *PEObj) {
         StringRef SectionName = *SectionNameOrErr;
         if (SectionName == ".text") {
             textSectionSize = Section.getSize();
-            outs() << "Text Section Size: " << textSectionSize << "\n";
+            outs() << "Text Section Size: 0x" << textSectionSize << "\n";
             break;
         }
     }
     return textSectionSize;  
 }
-
-struct FunctionInfo {
-    uint64_t physicalAddress;
-    uint64_t size;
-    StringRef name;
-
-    FunctionInfo(uint64_t addr, uint64_t sz, StringRef n) : physicalAddress(addr), size(sz), name(n) {}
-};
 
 uint64_t rva2offset(const COFFObjectFile *PEObj, uint64_t RVA) {
     // Iterate through the sections and find the .text section
@@ -86,34 +106,31 @@ uint64_t rva2offset(const COFFObjectFile *PEObj, uint64_t RVA) {
         }
 
         StringRef SectionName = *SectionNameOrErr;
+        
+        // Retrieve section's base address and size
+        uint64_t sectionBaseAddress = Section.getAddress();
+        uint64_t sectionSize = Section.getSize();
 
-        // Check if the section is .text
-        if (SectionName == ".text") {
-            // Retrieve section's base address and size
-            uint64_t sectionBaseAddress = Section.getAddress();
-            uint64_t sectionSize = Section.getSize();
+        // Get the corresponding COFF section using the SectionRef directly
+        Expected<const coff_section*> SectionOrErr = PEObj->getCOFFSection(Section);
+        if (!SectionOrErr) {
+            errs() << "Error: " << toString(SectionOrErr.takeError()) << "\n";
+            continue;  // Skip if an error occurs
+        }
 
-            // Get the corresponding COFF section using the SectionRef directly
-            Expected<const coff_section*> SectionOrErr = PEObj->getCOFFSection(Section);
-            if (!SectionOrErr) {
-                errs() << "Error: " << toString(SectionOrErr.takeError()) << "\n";
-                continue;  // Skip if an error occurs
-            }
+        const coff_section* CoffSection = *SectionOrErr;
 
-            const coff_section* CoffSection = *SectionOrErr;
+        // Compare section name with the one from COFF section (use StringRef for comparison)
+        if (SectionName == StringRef(CoffSection->Name)) {
+            // We found the matching section, now get PointerToRawData
+            uint64_t pointerToRawData = CoffSection->PointerToRawData;
 
-            // Compare section name with the one from COFF section (use StringRef for comparison)
-            if (SectionName == StringRef(CoffSection->Name)) {
-                // We found the matching section, now get PointerToRawData
-                uint64_t pointerToRawData = CoffSection->PointerToRawData;
+            // Check if the RVA is within the .text section's address range
+            if (RVA >= sectionBaseAddress && RVA < sectionBaseAddress + sectionSize) {
+                // Calculate the offset using PointerToRawData
+                uint64_t offset = RVA - sectionBaseAddress + pointerToRawData;
 
-                // Check if the RVA is within the .text section's address range
-                if (RVA >= sectionBaseAddress && RVA < sectionBaseAddress + sectionSize) {
-                    // Calculate the offset using PointerToRawData
-                    uint64_t offset = RVA - sectionBaseAddress + pointerToRawData;
-
-                    return offset;
-                }
+                return offset;
             }
         }
     }
@@ -190,7 +207,7 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
                 }
 
                 // Add the function to the list with its translated address
-                allFunctions.push_back(FunctionInfo(offset, 0, Name));
+                allFunctions.push_back(FunctionInfo(offset, 0, Name.str().c_str()));
             }
         }
 
@@ -222,9 +239,9 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
             }
         }
 
-        // Apply the filter and store the filtered functions
+        // Filter functions (example: only those containing "node")
         for (const auto &func : allFunctions) {
-            if (func.name.contains("node")) { // Apply the filter here
+            if (func.name[0] == 'n') { // Apply the filter here (simplified)
                 functionsData.push_back(func);
             }
         }
@@ -240,75 +257,188 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
     return functionsData;
 }
 
-void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint64_t binaryBaseAddress, uint8_t key, std::vector<char>& buffer) {
+void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint8_t key, std::vector<char>& buffer) {
+    uint64_t binaryBaseAddress = reinterpret_cast<uint64_t>(buffer.data());
+    // outs() << "binaryBaseAddress: 0x" << Twine::utohexstr(binaryBaseAddress) << "\n";
     for (auto& func : functionsData) {
-        // Adjust the address
-        uint64_t adjustedAddress = binaryBaseAddress + func.physicalAddress;
+        // Calculate the correct offset for the function in the buffer
+        uint64_t functionStartOffset = func.physicalAddress;
+        
+        // outs() << "functionStartOffset: 0x" << Twine::utohexstr(functionStartOffset) << "\n"; 
+
+        uint64_t functionEndOffset = functionStartOffset + func.size;
 
         // Encrypt the function bytes using XOR
-        uint64_t offset = adjustedAddress - binaryBaseAddress;
-        for (uint64_t i = offset; i < offset + func.size; ++i) {
+        for (uint64_t i = functionStartOffset; i < functionEndOffset; ++i) {
             buffer[i] ^= key;
         }
     }
 }
 
 // XOR encryption function for the binary
-void xorEncryptBinary(const std::string& filePath, uint8_t key) {
-    // Step 1: Read the binary file into memory
-    std::ifstream inputFile(filePath, std::ios::binary | std::ios::ate);
-    if (!inputFile.is_open()) {
-        std::cerr << "Error: Could not open file " << filePath << "\n";
+void xorEncryptBinary(const std::string& filePath, uint8_t key, std::vector<FunctionInfo>& functionsData) {
+    // Step 1: Read the binary file into a buffer
+    std::ifstream file(filePath, std::ios::binary);
+    if (!file) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
         return;
     }
 
-    // Read the file into a memory buffer
-    std::streamsize size = inputFile.tellg();
-    inputFile.seekg(0, std::ios::beg);
-    
-    std::vector<char> buffer(size);
-    if (!inputFile.read(buffer.data(), size)) {
-        std::cerr << "Error: Could not read the file " << filePath << "\n";
-        return;
-    }
-    inputFile.close();
+    std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    file.close();
 
-    // Step 2: Analyze the executable to get function data
-    StringRef filePathRef(filePath);
-    std::vector<FunctionInfo> functionsData = analyzeExecutable(filePathRef);
+    // Step 3: Apply XOR encryption to the specified functions
+    xorEncryptFunctions(functionsData, key, buffer);
 
-    // Step 3: Get the actual memory address of the buffer as the binaryBaseAddress
-    uint64_t binaryBaseAddress = reinterpret_cast<uint64_t>(buffer.data());
-    std::cout << "Loaded binary in memory at address: 0x" << std::hex << binaryBaseAddress << "\n";
-
-    // Step 4: Encrypt the functions using XOR
-    xorEncryptFunctions(functionsData, binaryBaseAddress, key, buffer);
-
-    // Step 5: Write the modified binary back to disk
-    std::ofstream outputFile(filePath + "_encrypted.exe", std::ios::binary);
-    if (!outputFile.is_open()) {
-        std::cerr << "Error: Could not open file for writing " << filePath << "\n";
+    // Step 4: Write the encrypted buffer back to the file
+    std::ofstream outFile(filePath, std::ios::binary);
+    if (!outFile) {
+        std::cerr << "Error opening output file: " << filePath << std::endl;
         return;
     }
 
-    outputFile.write(buffer.data(), size);
-    outputFile.close();
+    outFile.write(buffer.data(), buffer.size());
+    outFile.close();
 
-    std::cout << "Encryption complete. File has been modified: " << filePath + "_encrypted.exe" << "\n";
+    std::cout << "Binary encrypted successfully!" << std::endl;
 }
 
-int main(int argc, char **argv) {
-    InitLLVM X(argc, argv);
+std::vector<char> serializeFunctionData(const std::vector<FunctionInfo>& functions) {
+    std::vector<char> serializedData;
 
-    if (argc < 2) {
-        errs() << "Usage: " << argv[0] << " <binary-file>\n";
+    // Serialize each FunctionInfo
+    for (const auto& func : functions) {
+        // Serialize the physical address (8 bytes)
+        for (int i = 0; i < 8; ++i) {
+            serializedData.push_back(static_cast<char>((func.physicalAddress >> (i * 8)) & 0xFF));
+        }
+        // Serialize the size (8 bytes)
+        for (int i = 0; i < 8; ++i) {
+            serializedData.push_back(static_cast<char>((func.size >> (i * 8)) & 0xFF));
+        }
+        // Serialize the name (256 bytes, fixed size)
+        for (int i = 0; i < 64; ++i) {
+            serializedData.push_back(func.name[i]);
+        }
+    }
+
+    return serializedData;
+}
+
+Expected<std::unique_ptr<COFFObjectFile>> readCOFFObjectFile(const std::string &filePath) {
+    ErrorOr<std::unique_ptr<MemoryBuffer>> bufferOrErr = MemoryBuffer::getFile(filePath);
+    if (std::error_code ec = bufferOrErr.getError()) {
+        return createStringError(ec, "Failed to open file: " + filePath);
+    }
+
+    Expected<std::unique_ptr<COFFObjectFile>> objOrErr = ObjectFile::createCOFFObjectFile(*bufferOrErr.get());
+    if (!objOrErr) {
+        return objOrErr.takeError();
+    }
+
+    return objOrErr;
+}
+
+// Function to write serialized data to the executable at the specified offset
+void writeSerializedDataToExecutable(const std::string& filePath, const std::vector<FunctionInfo>& functionsData) {
+    std::vector<char> serializedData = serializeFunctionData(functionsData);
+
+    Expected<OwningBinary<Binary>> BinaryOrErr = createBinary(filePath);
+    if (!BinaryOrErr) {
+        errs() << "Error: " << toString(BinaryOrErr.takeError()) << "\n";
+        return;
+    }
+
+    Binary &Binary = *BinaryOrErr.get().getBinary();
+    
+    const COFFObjectFile *PEObj = nullptr;
+
+    // Check if the binary is a PE file
+    if (const COFFObjectFile *TempPEObj = dyn_cast<COFFObjectFile>(&Binary)) {
+        PEObj = TempPEObj;
+    } else {
+        errs() << "Not a valid PE file.\n";
+        return;
+    }
+
+    uint64_t metaSectionOffset = rva2offset(PEObj, getMetaSectionAddress(PEObj));
+
+    std::cout << ".meta Offset: 0x" << std::hex << metaSectionOffset << std::endl; 
+
+    if (metaSectionOffset == 0) {
+        std::cerr << "No valid metadata section found!" << std::endl;
+        return;
+    }
+
+    std::fstream file(filePath, std::ios::in | std::ios::out | std::ios::binary);
+    if (!file) {
+        std::cerr << "Error opening file: " << filePath << std::endl;
+        return;
+    }
+
+    file.seekp(metaSectionOffset);
+    if (!file) {
+        std::cerr << "Error seeking to the specified offset in the file." << std::endl;
+        return;
+    }
+
+    std::cout << "Writing Data of Size: 0x" << std::hex << serializedData.size() << " to .meta" << std::endl;
+    file.write(serializedData.data(), serializedData.size());
+    if (!file) {
+        std::cerr << "Error writing serialized data to file." << std::endl;
+        return;
+    }
+
+    file.close();
+    
+    std::cout << "Serialized data written to executable successfully!" << std::endl;
+}
+
+
+int main(int argc, char** argv) {
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> <key>" << std::endl;
+        std::cerr << "Example: " << argv[0] << " out/metamorphic.exe '0xAA'" << std::endl;
         return 1;
     }
 
-    const uint8_t XOR_KEY = 0xAA;  // Example static key, modify as needed
+    std::string inputFilePath = argv[1];
+    std::string keyStr = argv[2];
+    uint8_t encryptionKey = 0;
 
-    // Call the function to XOR encrypt the binary and overwrite the original
-    xorEncryptBinary(argv[1], XOR_KEY);
+    if (keyStr.substr(0, 2) == "0x" || keyStr.substr(0, 2) == "0X") {
+        // Remove the "0x" or "0X" prefix and convert the rest to a hex number
+        std::stringstream ss;
+        ss << std::hex << keyStr.substr(2);  // Ignore the "0x" prefix
+        int tempKey;
+        ss >> tempKey;
+
+        if (ss.fail()) {
+            std::cerr << "Error: Failed to parse the key as a hexadecimal number!" << std::endl;
+            return 1;
+        }
+        encryptionKey = static_cast<uint8_t>(tempKey);
+    } else {
+        // If there's no "0x", treat the input as a decimal integer
+        try {
+            encryptionKey = std::stoi(keyStr);
+        } catch (const std::invalid_argument& e) {
+            std::cerr << "Error: Invalid key format!" << std::endl;
+            return 1;
+        }
+    }
+
+    std::cout << "Using encryption key: 0x" << std::hex << +encryptionKey << std::endl;
+
+    std::vector<FunctionInfo> functions = analyzeExecutable(inputFilePath);
+    if (functions.empty()) {
+        std::cerr << "No functions found or failed to analyze executable!" << std::endl;
+        return 1;
+    }
+
+    xorEncryptBinary(inputFilePath, encryptionKey, functions);
+
+    writeSerializedDataToExecutable(inputFilePath, functions);
 
     return 0;
 }

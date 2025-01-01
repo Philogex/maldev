@@ -1,4 +1,7 @@
+
 #include "config.h"
+
+__attribute__((section(".meta"))) uint8_t metadata_section[4096] = {0};
 
 unsigned int prng_seed = PRNG_SEED;
 

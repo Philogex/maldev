@@ -32,11 +32,10 @@ int main() {
 	//printSectionHeaders();
 
 	printf("Checking Nodes:\n");
-	size_t functionCount = 9;
-	analyzeExecutable(&functionCount);
+	analyzeExecutable();
 
     printf("Executing graph from Node 0 with max depth of 3:\n");
-    //execute_graph(0, 2, 0, adj_table);
+    execute_graph(0, 2, 0, adj_table);
 
     return 0;
 }

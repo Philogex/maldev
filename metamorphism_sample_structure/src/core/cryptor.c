@@ -51,30 +51,7 @@ void printSectionHeaders() {
     }
 }
 
-// this is copy pasted from somewhere... i don't know from where
-// found it: https://gist.github.com/Niko10/c96eb7330f81b1c8a2473665af9c0379
-DWORD Rva2Offset(DWORD dwRva, UINT_PTR uiBaseAddress)
-{
-	WORD wIndex = 0;
-	PIMAGE_SECTION_HEADER pSectionHeader = NULL;
-	PIMAGE_NT_HEADERS pNtHeaders = NULL;
-
-	pNtHeaders = (PIMAGE_NT_HEADERS)(uiBaseAddress + ((PIMAGE_DOS_HEADER)uiBaseAddress)->e_lfanew);
-	pSectionHeader = (PIMAGE_SECTION_HEADER)((UINT_PTR)(&pNtHeaders->OptionalHeader) + pNtHeaders->FileHeader.SizeOfOptionalHeader);
-
-	if (dwRva < pSectionHeader[0].PointerToRawData)
-		return dwRva;
-
-	for (wIndex = 0; wIndex < pNtHeaders->FileHeader.NumberOfSections; wIndex++)
-	{
-		if (dwRva >= pSectionHeader[wIndex].VirtualAddress && dwRva < (pSectionHeader[wIndex].VirtualAddress + pSectionHeader[wIndex].SizeOfRawData))
-			return (dwRva - pSectionHeader[wIndex].VirtualAddress + pSectionHeader[wIndex].PointerToRawData);
-	}
-
-	return 0;
-}
-
-FunctionInfo* analyzeExecutable(size_t* functionCount) {
+FunctionInfo* analyzeExecutable() {
     UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
     if (baseAddress == 0) {
         printf("Error: Unable to get module handle.\n");
@@ -93,41 +70,25 @@ FunctionInfo* analyzeExecutable(size_t* functionCount) {
 
     PIMAGE_SECTION_HEADER pSectionHeader = (PIMAGE_SECTION_HEADER)((UINT_PTR)(&pNtHeaders->OptionalHeader) + pNtHeaders->FileHeader.SizeOfOptionalHeader);
 
-    ULONGLONG textSectionVA = 0;
-    DWORD textSectionSize = 0;
+    ULONGLONG metaSectionVA = 0;
+    DWORD metaSectionSize = 0;
 
     for (int i = 0; i < pNtHeaders->FileHeader.NumberOfSections; i++) {
-        if (strncmp((char *)pSectionHeader[i].Name, ".text", 5) == 0) {
-            textSectionVA = pSectionHeader[i].VirtualAddress;
-            textSectionSize = pSectionHeader[i].SizeOfRawData;
+        if (strncmp((char *)pSectionHeader[i].Name, ".meta", 5) == 0) {
+            metaSectionVA = pSectionHeader[i].VirtualAddress;
+            metaSectionSize = pSectionHeader[i].SizeOfRawData;
             break;
         }
     }
 
-    if (textSectionVA == 0) {
-        printf("Error: .text section not found.\n");
+    if (metaSectionVA == 0) {
+        printf("Error: .meta section not found.\n");
         return NULL;
     }
 
-    printf("Text Section Address: 0x%llX, Size: %lX bytes\n", textSectionVA, textSectionSize);
-
-    DWORD* functionRVAs = malloc(sizeof(DWORD) * 1024); // Temporary storage for function RVAs
-    size_t functionRVAIndex = 0;
-
-
-
-
+    printf(".meta Section Address: 0x%llX, Size: 0x%lX bytes\n", metaSectionVA, metaSectionSize);
 
     // MISSING (Parse Metadata from Header)
-
-
-
-
-
-    ULONGLONG test = Rva2Offset(textSectionVA + (DWORD)0x9d0, baseAddress);
-    printf("Testing Rva2Offset: 0x%llX\n", test);
-
-    *functionCount = functionRVAIndex;
 
     // Return the list of functions (if we were to fill functionList here)
     // Note: The function list is currently not fully implemented here

@@ -12,11 +12,11 @@
 typedef struct {
     ULONGLONG physicalAddress; // File offset
     ULONGLONG size;            // Size of the function
-    char name[256];        // Name of the function
+    char name[64];        // Name of the function
 } FunctionInfo;
 
 extern void decrypt_function(const unsigned char *encrypted, size_t size);
 extern void printSectionHeaders();
-extern FunctionInfo* analyzeExecutable(size_t* functionCount);
+extern FunctionInfo* analyzeExecutable();
 
 #endif // CRYPTOR_H
