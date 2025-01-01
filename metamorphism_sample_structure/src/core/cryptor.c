@@ -6,6 +6,7 @@ func overwrite_disk_binary
 */
 
 #include "cryptor.h"
+#include "../crypto/xor.h"
 
 void overwrite_offset(const char *file_path, long offset, const void *data, size_t data_size) {
     FILE *file = fopen(file_path, "r+b"); // Open file in read-write binary mode
@@ -71,7 +72,7 @@ void deserializeFunctionData(ULONGLONG startOffset, FunctionInfo **functions, si
     }
 }
 
-FunctionInfo* analyzeExecutable() {
+FunctionInfo* analyzeExecutable(size_t *numFunctions) {
     UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
     if (baseAddress == 0) {
         printf("Error: Unable to get module handle.\n");
@@ -110,13 +111,12 @@ FunctionInfo* analyzeExecutable() {
 
     // MISSING (Parse Metadata from Header)
     FunctionInfo *functions = NULL;
-    size_t numFunctions = 0;
 
     // Deserialize the function data
-    deserializeFunctionData(baseAddress + metaSectionVA, &functions, &numFunctions);
+    deserializeFunctionData(baseAddress + metaSectionVA, &functions, numFunctions);
 
     // Print the deserialized data
-    for (size_t i = 0; i < numFunctions; i++) {
+    for (size_t i = 0; i < *numFunctions; i++) {
         printf("Function %zu:\n", i + 1);
         printf("Virtual Address: 0x%llx\n", functions[i].virtualAddress);
         printf("Physical Address: 0x%llx\n", functions[i].physicalAddress);
@@ -126,14 +126,77 @@ FunctionInfo* analyzeExecutable() {
 
     // Return the list of functions (if we were to fill functionList here)
     // Note: The function list is currently not fully implemented here
+    return functions;  // Function list would be returned here once populated
+}
+
+void decrypt_functions() {
+    FunctionInfo* functions = NULL;
+    size_t numFunctions = 0;
+
+    // Analyze the executable to retrieve the function information
+    functions = analyzeExecutable(&numFunctions);
+    if (functions == NULL || numFunctions == 0) {
+        fprintf(stderr, "No functions found or failed to analyze executable.\n");
+        return;
+    }
+
+    // Get the base address of the loaded module
+    UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
+    if (baseAddress == 0) {
+        fprintf(stderr, "Failed to get the base address of the module.\n");
+        return;
+    }
+
+    // Encryption key (should match the key used during encryption)
+    unsigned char encryptionKey = 0xAA;
+
+    // Loop through all functions and decrypt them in memory
+    for (size_t i = 0; i < numFunctions; ++i) {
+        FunctionInfo* function = &functions[i];
+
+        // Calculate the absolute memory address of the function
+        UINT_PTR functionAddress = baseAddress + function->virtualAddress;
+
+        // Check if the function size is valid
+        if (function->size == 0) {
+            fprintf(stderr, "Function %s has size 0. Skipping.\n", function->name);
+            continue;
+        }
+
+        DWORD oldProtect;
+        if (!VirtualProtect((LPVOID)functionAddress, function->size, PAGE_EXECUTE_READWRITE, &oldProtect)) {
+            fprintf(stderr, "Failed to change memory protection for function: %s at address: 0x%p.\n",
+                    function->name, (void*)functionAddress);
+            continue;
+        }
+        
+        // Perform XOR decryption on the function's memory
+        unsigned char* functionMemory = (unsigned char*)functionAddress;
+        xor(functionMemory, function->size, encryptionKey);
+
+        // Restore the original memory protection
+        if (!VirtualProtect((LPVOID)functionAddress, function->size, oldProtect, &oldProtect)) {
+            fprintf(stderr, "Failed to restore memory protection for function: %s at address: 0x%p.\n",
+                    function->name, (void*)functionAddress);
+        }
+
+        // Log the operation for debugging purposes
+        printf("Decrypted function: %s at address: 0x%p with size: %llu bytes.\n",
+               function->name,
+               (void*)functionAddress,
+               function->size);
+    }
+
     free(functions);
-    return NULL;  // Function list would be returned here once populated
+
+    printf("All functions decrypted successfully!\n");
 }
 
-void decrypt_function(const unsigned char *encrypted, size_t size) {
-    
-}
+void encrypt_functions() {
+	UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
+    FunctionInfo* functions = NULL;
+    size_t numFunctions = 0;
+	functions = analyzeExecutable(&numFunctions);
 
-void encrypt_function(const unsigned char *decrypted, size_t size) {
-    
+
 }

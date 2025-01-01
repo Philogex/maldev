@@ -26,13 +26,10 @@ func main
 
 int main() {
     //printf("Decrypt all functions\n"); //location might change to control_flow_handler
-    //decrypt_function(node, sizeof(node));
+    decrypt_functions();
 
-	printf("Checking current Handle:\n");
+	//printf("Checking current Handle:\n");
 	//printSectionHeaders();
-
-	printf("Checking Nodes:\n");
-	analyzeExecutable();
 
     printf("Executing graph from Node 0 with max depth of 3:\n");
     execute_graph(0, 2, 0, adj_table);

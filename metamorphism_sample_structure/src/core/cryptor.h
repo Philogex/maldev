@@ -16,8 +16,9 @@ typedef struct {
     char name[64];        // Name of the function
 } FunctionInfo;
 
-extern void decrypt_function(const unsigned char *encrypted, size_t size);
+extern void encrypt_functions();
+extern void decrypt_functions();
 extern void printSectionHeaders();
-extern FunctionInfo* analyzeExecutable();
+extern FunctionInfo* analyzeExecutable(size_t *numFunctions);
 
 #endif // CRYPTOR_H
