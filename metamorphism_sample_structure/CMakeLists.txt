@@ -196,6 +196,21 @@ add_custom_command(
     DEPENDS ${CMAKE_BINARY_DIR}/out/main_pass.bc
 )
 
+# Custom command to encrypt functions
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
+    COMMAND ${CMAKE_BINARY_DIR}/out/function_encrypter ${CMAKE_BINARY_DIR}/out/metamorphic.exe ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe "0xAA"
+    COMMENT "Encrypting Functions of metamorphic.exe"
+    DEPENDS 
+        ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+        ${CMAKE_BINARY_DIR}/out/function_encrypter
+)
+
+# Custom target to group all post-build commands
+add_custom_target(encrypt_functions ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
+)
+
 # Custom target to group all post-build commands
 add_custom_target(post_build_commands ALL
     DEPENDS 
@@ -204,12 +219,14 @@ add_custom_target(post_build_commands ALL
         ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
         ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted.exe
         ${CMAKE_SOURCE_DIR}/out/function_encrypter
 )
 
 # List of files to copy to the output directory
 set(INPUT_FILES
     ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+    ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
     ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
     ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
     ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
@@ -221,6 +238,7 @@ set(INPUT_FILES
 add_custom_command(
     OUTPUT 
         ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_disasm.txt
         ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt
@@ -234,5 +252,6 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
         ${CMAKE_BINARY_DIR}/out/metamorphic.exe
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
         ${CMAKE_BINARY_DIR}/out/function_encrypter
 )

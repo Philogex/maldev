@@ -51,6 +51,26 @@ void printSectionHeaders() {
     }
 }
 
+void deserializeFunctionData(ULONGLONG startOffset, FunctionInfo **functions, size_t *numFunctions) {
+    // Read the size of the array (8 bytes)
+    ULONGLONG arraySize = 0;
+    memcpy(&arraySize, (void*)startOffset, sizeof(ULONGLONG));
+
+    *numFunctions = (size_t)arraySize;  // Set the number of functions
+
+    // Allocate memory for the functions array
+    *functions = (FunctionInfo *)malloc(sizeof(FunctionInfo) * (*numFunctions));
+    if (*functions == NULL) {
+        perror("Failed to allocate memory for functions");
+        return;
+    }
+
+    // Read each FunctionInfo struct
+    for (size_t i = 0; i < *numFunctions; i++) {
+        memcpy(&(*functions)[i], (void*)(startOffset + sizeof(ULONGLONG) + i * sizeof(FunctionInfo)), sizeof(FunctionInfo));
+    }
+}
+
 FunctionInfo* analyzeExecutable() {
     UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
     if (baseAddress == 0) {
@@ -89,9 +109,24 @@ FunctionInfo* analyzeExecutable() {
     printf(".meta Section Address: 0x%llX, Size: 0x%lX bytes\n", metaSectionVA, metaSectionSize);
 
     // MISSING (Parse Metadata from Header)
+    FunctionInfo *functions = NULL;
+    size_t numFunctions = 0;
+
+    // Deserialize the function data
+    deserializeFunctionData(baseAddress + metaSectionVA, &functions, &numFunctions);
+
+    // Print the deserialized data
+    for (size_t i = 0; i < numFunctions; i++) {
+        printf("Function %zu:\n", i + 1);
+        printf("Virtual Address: 0x%llx\n", functions[i].virtualAddress);
+        printf("Physical Address: 0x%llx\n", functions[i].physicalAddress);
+        printf("Size: 0x%llx\n", functions[i].size);
+        printf("Name: %s\n\n", functions[i].name);
+    }
 
     // Return the list of functions (if we were to fill functionList here)
     // Note: The function list is currently not fully implemented here
+    free(functions);
     return NULL;  // Function list would be returned here once populated
 }
 

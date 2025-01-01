@@ -23,11 +23,12 @@ using namespace llvm;
 using namespace llvm::object;
 
 struct FunctionInfo {
+    uint64_t virtualAddress;
     uint64_t physicalAddress;
     uint64_t size;
     char name[64];  // Fixed-size array for C compatibility
 
-    FunctionInfo(uint64_t addr, uint64_t sz, const char* n) : physicalAddress(addr), size(sz) {
+    FunctionInfo(uint64_t addr1, uint64_t addr2, uint64_t sz, const char* n) : virtualAddress(addr1), physicalAddress(addr2), size(sz) {
         strncpy(name, n, sizeof(name) - 1);
         name[sizeof(name) - 1] = '\0';  // Ensure null termination
     }
@@ -207,7 +208,7 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
                 }
 
                 // Add the function to the list with its translated address
-                allFunctions.push_back(FunctionInfo(offset, 0, Name.str().c_str()));
+                allFunctions.push_back(FunctionInfo(Address - baseAddress, offset, 0, Name.str().c_str()));
             }
         }
 
@@ -249,7 +250,8 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
         // Debug output for the filtered functions
         for (const auto &func : functionsData) {
             outs() << "Function: " << func.name
-                   << " Address: 0x" << Twine::utohexstr(func.physicalAddress)
+                   << " virtual Address: 0x" << Twine::utohexstr(func.virtualAddress)
+                   << " physical Address: 0x" << Twine::utohexstr(func.physicalAddress)
                    << " Size: " << func.size << " bytes\n";
         }
     }
@@ -275,7 +277,6 @@ void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint8_t key, 
     }
 }
 
-// XOR encryption function for the binary
 void xorEncryptBinary(const std::string& filePath, uint8_t key, std::vector<FunctionInfo>& functionsData) {
     // Step 1: Read the binary file into a buffer
     std::ifstream file(filePath, std::ios::binary);
@@ -303,11 +304,16 @@ void xorEncryptBinary(const std::string& filePath, uint8_t key, std::vector<Func
     std::cout << "Binary encrypted successfully!" << std::endl;
 }
 
+
 std::vector<char> serializeFunctionData(const std::vector<FunctionInfo>& functions) {
     std::vector<char> serializedData;
 
     // Serialize each FunctionInfo
     for (const auto& func : functions) {
+        // Serialize the virtual address (8 bytes)
+        for (int i = 0; i < 8; ++i) {
+            serializedData.push_back(static_cast<char>((func.virtualAddress >> (i * 8)) & 0xFF));
+        }
         // Serialize the physical address (8 bytes)
         for (int i = 0; i < 8; ++i) {
             serializedData.push_back(static_cast<char>((func.physicalAddress >> (i * 8)) & 0xFF));
@@ -339,7 +345,6 @@ Expected<std::unique_ptr<COFFObjectFile>> readCOFFObjectFile(const std::string &
     return objOrErr;
 }
 
-// Function to write serialized data to the executable at the specified offset
 void writeSerializedDataToExecutable(const std::string& filePath, const std::vector<FunctionInfo>& functionsData) {
     std::vector<char> serializedData = serializeFunctionData(functionsData);
 
@@ -382,6 +387,10 @@ void writeSerializedDataToExecutable(const std::string& filePath, const std::vec
         return;
     }
 
+    std::vector<char>::size_type amount = serializedData.size() / sizeof(FunctionInfo);
+    file.write(reinterpret_cast<const char*>(&amount), sizeof(amount));
+    file.write(serializedData.data(), serializedData.size());
+
     std::cout << "Writing Data of Size: 0x" << std::hex << serializedData.size() << " to .meta" << std::endl;
     file.write(serializedData.data(), serializedData.size());
     if (!file) {
@@ -396,20 +405,21 @@ void writeSerializedDataToExecutable(const std::string& filePath, const std::vec
 
 
 int main(int argc, char** argv) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <input_file> <key>" << std::endl;
-        std::cerr << "Example: " << argv[0] << " out/metamorphic.exe '0xAA'" << std::endl;
+    if (argc < 4) {
+        std::cerr << "Usage: " << argv[0] << " <input_file> <output_file> <key>" << std::endl;
+        std::cerr << "Example: " << argv[0] << " input.exe output.exe 0xAA" << std::endl;
         return 1;
     }
 
-    std::string inputFilePath = argv[1];
-    std::string keyStr = argv[2];
+    std::string inputFilePath = argv[1];  // Path to the existing input file
+    std::string outputFilePath = argv[2];  // Path to the new output file to be created
+    std::string keyStr = argv[3];  // Encryption key string
     uint8_t encryptionKey = 0;
 
+    // Process encryption key
     if (keyStr.substr(0, 2) == "0x" || keyStr.substr(0, 2) == "0X") {
-        // Remove the "0x" or "0X" prefix and convert the rest to a hex number
         std::stringstream ss;
-        ss << std::hex << keyStr.substr(2);  // Ignore the "0x" prefix
+        ss << std::hex << keyStr.substr(2);
         int tempKey;
         ss >> tempKey;
 
@@ -419,7 +429,6 @@ int main(int argc, char** argv) {
         }
         encryptionKey = static_cast<uint8_t>(tempKey);
     } else {
-        // If there's no "0x", treat the input as a decimal integer
         try {
             encryptionKey = std::stoi(keyStr);
         } catch (const std::invalid_argument& e) {
@@ -430,15 +439,36 @@ int main(int argc, char** argv) {
 
     std::cout << "Using encryption key: 0x" << std::hex << +encryptionKey << std::endl;
 
+    // Copy the input file to the output file (1:1 copy)
+    std::ifstream inputFile(inputFilePath, std::ios::binary);
+    std::ofstream outputFile(outputFilePath, std::ios::binary);
+    if (!inputFile) {
+        std::cerr << "Error opening input file: " << inputFilePath << std::endl;
+        return 1;
+    }
+    if (!outputFile) {
+        std::cerr << "Error opening output file: " << outputFilePath << std::endl;
+        return 1;
+    }
+
+    // Perform a 1:1 copy of the input file to the output file
+    outputFile << inputFile.rdbuf();
+
+    inputFile.close();
+    outputFile.close();
+
+    // Analyze functions in the input file
     std::vector<FunctionInfo> functions = analyzeExecutable(inputFilePath);
     if (functions.empty()) {
         std::cerr << "No functions found or failed to analyze executable!" << std::endl;
         return 1;
     }
 
-    xorEncryptBinary(inputFilePath, encryptionKey, functions);
+    // Perform XOR encryption and write encrypted binary to the output file
+    xorEncryptBinary(outputFilePath, encryptionKey, functions);  // Encrypt and write to output file
 
-    writeSerializedDataToExecutable(inputFilePath, functions);
+    // Write serialized data to the output executable
+    writeSerializedDataToExecutable(outputFilePath, functions);  // Write to output file
 
     return 0;
 }

@@ -10,6 +10,7 @@
 #include "../data/config.h"
 
 typedef struct {
+	ULONGLONG virtualAddress; // RVA offset
     ULONGLONG physicalAddress; // File offset
     ULONGLONG size;            // Size of the function
     char name[64];        // Name of the function
