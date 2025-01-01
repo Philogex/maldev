@@ -1,1 +1,0 @@
-clang++-16 -fPIC -shared -Wl,-soname,libencryption_pass.so -o libencryption_pass.so CMakeFiles/encryption_pass.dir/lib/passes/encryption_pass.cpp.o
