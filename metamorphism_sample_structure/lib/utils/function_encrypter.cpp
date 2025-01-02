@@ -158,6 +158,11 @@ std::vector<std::string> deserializeAnnotatedFunctions(const std::string &filePa
         return functionNames;
     }
 
+    if(arraySize == 0) {
+        errs() << "No function to be encrypted. Exiting\n";
+        exit(0);
+    }
+
     // Read each function name (64 bytes per entry)
     for (uint64_t i = 0; i < arraySize; ++i) {
         char nameBuffer[64] = {0};
