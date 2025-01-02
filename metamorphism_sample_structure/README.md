@@ -6,7 +6,7 @@ encryption_pass is currently used to write metadata (not yet implemented, just a
 i just realized, that i have PIC enabled, so i don't have to worry about relocation for 99% of cases, and as long as i don't do anything stupid i won't have to manually configure the .reloc \
 i just finished doing just that. like the line right above this \
 things to do:
-- decrypting of functions during runtime
+- need to fix program/ compile process if there are no encrypted functions
 - dynamic recrypting of functions and writing to disk (arguably the most difficult step from this list, since i need to write another rva to physical parser, but i already have code snippets this time and won't use the llvm library... probably)
 - generating and processing of metadata between function_encrypter.cpp and encryption_pass.cpp (metadata also has to include the custom key for aes) 
 - implementing aes encryption inside aes.c or currently aes.h

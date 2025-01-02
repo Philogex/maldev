@@ -141,8 +141,47 @@ uint64_t rva2offset(const COFFObjectFile *PEObj, uint64_t RVA) {
     return UINT64_MAX;  // Return an invalid offset if not found
 }
 
+std::vector<std::string> deserializeAnnotatedFunctions(const std::string &filePath) {
+    std::vector<std::string> functionNames;
+
+    std::ifstream inFile(filePath, std::ios::binary);
+    if (!inFile) {
+        errs() << "Error: Unable to open file: " << filePath << "\n";
+        return functionNames;
+    }
+
+    // Read the size of the array (8 bytes)
+    uint64_t arraySize = 0;
+    inFile.read(reinterpret_cast<char *>(&arraySize), sizeof(arraySize));
+    if (!inFile) {
+        errs() << "Error: Failed to read array size from file\n";
+        return functionNames;
+    }
+
+    // Read each function name (64 bytes per entry)
+    for (uint64_t i = 0; i < arraySize; ++i) {
+        char nameBuffer[64] = {0};
+        inFile.read(nameBuffer, sizeof(nameBuffer));
+        if (!inFile) {
+            errs() << "Error: Failed to read function name from file\n";
+            break;
+        }
+
+        // Convert to std::string and add to the vector
+        functionNames.emplace_back(nameBuffer);
+    }
+
+    inFile.close();
+    return functionNames;
+}
+
+// VERY IMPORTANT: to generate less telemetry this should fuse directly adjacent functions
 std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
     std::vector<FunctionInfo> functionsData;
+
+    // Deserialize annotated functions
+    const std::string annotationsFile = "annotated_functions.bin";
+    std::vector<std::string> annotatedFunctions = deserializeAnnotatedFunctions(annotationsFile);
 
     Expected<OwningBinary<Binary>> BinaryOrErr = createBinary(FilePath);
     if (!BinaryOrErr) {
@@ -242,8 +281,11 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
 
         // Filter functions (example: only those containing "node")
         for (const auto &func : allFunctions) {
-            if (func.name[0] == 'n') { // Apply the filter here (simplified)
-                functionsData.push_back(func);
+            for (const auto &annotatedFunc : annotatedFunctions) {
+                if (std::strcmp(func.name, annotatedFunc.c_str()) == 0) {
+                    functionsData.push_back(func);
+                    break; // Stop searching after finding a match
+                }
             }
         }
 
