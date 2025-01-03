@@ -358,6 +358,7 @@ std::vector<char> serializeFunctionData(const std::vector<FunctionInfo>& functio
     // Serialize each FunctionInfo
     for (const auto& func : functions) {
         // Serialize the virtual address (8 bytes)
+        //all of the i*8 & 0xFF is pretty much unneccessary, but eh
         for (int i = 0; i < 8; ++i) {
             serializedData.push_back(static_cast<char>((func.virtualAddress >> (i * 8)) & 0xFF));
         }
@@ -392,7 +393,7 @@ Expected<std::unique_ptr<COFFObjectFile>> readCOFFObjectFile(const std::string &
     return objOrErr;
 }
 
-void writeSerializedDataToExecutable(const std::string& filePath, const std::vector<FunctionInfo>& functionsData) {
+void writeSerializedDataToExecutable(const std::string& filePath, const std::vector<FunctionInfo>& functionsData, uint8_t key) {
     std::vector<char> serializedData = serializeFunctionData(functionsData);
 
     Expected<OwningBinary<Binary>> BinaryOrErr = createBinary(filePath);
@@ -436,10 +437,21 @@ void writeSerializedDataToExecutable(const std::string& filePath, const std::vec
 
     std::vector<char>::size_type amount = serializedData.size() / sizeof(FunctionInfo);
     file.write(reinterpret_cast<const char*>(&amount), sizeof(amount));
-    file.write(serializedData.data(), serializedData.size());
+    if (!file) {
+        std::cerr << "Error writing serialized data to file." << std::endl;
+        return;
+    }
 
     std::cout << "Writing Data of Size: 0x" << std::hex << serializedData.size() << " to .meta" << std::endl;
     file.write(serializedData.data(), serializedData.size());
+    if (!file) {
+        std::cerr << "Error writing serialized data to file." << std::endl;
+        return;
+    }
+
+    std::cout << "Writing Key: 0x" << std::uppercase << std::hex << (int)key << " to end of .meta" << std::endl;
+    file.seekp(metaSectionOffset + 4096 - sizeof(key)); //WARNING CONSTANT DEPENDENT ON SECTION SIZE
+    file.write(reinterpret_cast<const char*>(&key), sizeof(key));
     if (!file) {
         std::cerr << "Error writing serialized data to file." << std::endl;
         return;
@@ -515,7 +527,7 @@ int main(int argc, char** argv) {
     xorEncryptBinary(outputFilePath, encryptionKey, functions);  // Encrypt and write to output file
 
     // Write serialized data to the output executable
-    writeSerializedDataToExecutable(outputFilePath, functions);  // Write to output file
+    writeSerializedDataToExecutable(outputFilePath, functions, encryptionKey);  // Write to output file
 
     return 0;
 }

@@ -7,16 +7,27 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <direct.h>
+#include <time.h>
 #include "../data/config.h"
 
 typedef struct {
 	ULONGLONG virtualAddress; // RVA offset
     ULONGLONG physicalAddress; // File offset
-    ULONGLONG size;            // Size of the function
+    ULONGLONG size; // Size of the function in memory (it might error on disk... i'll take my chances for now)
     char name[64];        // Name of the function
 } FunctionInfo;
 
-extern void encrypt_functions();
+typedef struct {
+    const char *executablePath;
+    FunctionInfo *functions;
+    size_t numFunctions;
+    unsigned char recryptionKey;
+    unsigned char nextEncryptionKey;
+    UINT_PTR keyAddress;
+} ThreadData;
+
+extern void encrypt_physical_functions();
 extern void decrypt_functions();
 extern void printSectionHeaders();
 extern FunctionInfo* analyzeExecutable(size_t *numFunctions);

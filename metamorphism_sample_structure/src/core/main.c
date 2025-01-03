@@ -25,7 +25,7 @@ func main
 #include "../data/adjacency_table.h"
 
 int main() {
-    //printf("Decrypt all functions\n"); //location might change to control_flow_handler
+    printf("Decrypt all functions\n"); //location might change to control_flow_handler
     decrypt_functions();
 
 	//printf("Checking current Handle:\n");
@@ -33,6 +33,9 @@ int main() {
 
     printf("Executing graph from Node 0 with max depth of 3:\n");
     execute_graph(0, 2, 0, adj_table);
+
+    printf("Recrypting all functions\n"); //location might change to control_flow_handler
+    encrypt_physical_functions();
 
     return 0;
 }
