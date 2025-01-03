@@ -36,7 +36,7 @@ int main() {
 
     //printf("Recrypting all functions\n"); //location might change to control_flow_handler
     //encrypt_physical_functions();
-    // call to fileless pe loader for meta_engine.c of section .engn
+    // call to fileless pe loader for meta_engine.c at the end of the current pe
 
     return 0;
 }

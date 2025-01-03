@@ -151,7 +151,8 @@ FunctionInfo* analyzeExecutable(size_t *numFunctions) {
     return functions;
 }
 
-void decrypt_functions() { //this should have a string or index parameter soon, so they can get dynamically de- and encrypted
+// this should have a string or index parameter soon, so they can get dynamically de- and encrypted
+void decrypt_functions() { 
     FunctionInfo* functions = NULL;
     size_t numFunctions = 0;
 

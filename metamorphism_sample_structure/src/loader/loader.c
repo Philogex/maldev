@@ -1,5 +1,20 @@
 #include "loader.h"
 
+/*
+NTSYSAPI 
+NTSTATUS
+NTAPI
+
+
+NtUnmapViewOfSection(
+
+
+
+  IN HANDLE               ProcessHandle,
+  IN PVOID                BaseAddress );
+
+*/
+
 void GetPEFileSize(const char* peFilePath) {
     // Open the PE file
     FILE* file = fopen(peFilePath, "rb");
@@ -64,6 +79,9 @@ void GetPEFileSize(const char* peFilePath) {
     fclose(file);
 }
 
+ULONGLONG getPEBaseAddress() {
+    return 0ULL;
+}
 
 void passProcessInfo() { //creates shared memory to pass ProcessData
 
@@ -117,3 +135,10 @@ void passProcessInfo() { //creates shared memory to pass ProcessData
 
 }
 
+void fixIAT() {
+
+}
+
+void loadPE() {
+
+}
