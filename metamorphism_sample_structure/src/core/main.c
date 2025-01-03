@@ -34,8 +34,9 @@ int main() {
     printf("Executing graph from Node 0 with max depth of 3:\n");
     execute_graph(0, 2, 0, adj_table);
 
-    printf("Recrypting all functions\n"); //location might change to control_flow_handler
-    encrypt_physical_functions();
+    //printf("Recrypting all functions\n"); //location might change to control_flow_handler
+    //encrypt_physical_functions();
+    // call to fileless pe loader for meta_engine.c of section .engn
 
     return 0;
 }

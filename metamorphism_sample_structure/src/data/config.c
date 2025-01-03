@@ -1,5 +1,5 @@
-
 #include "config.h"
+#define SHARED_MEMORY_NAME "Meta\\ProcessInfo"
 
 __attribute__((section(".meta"))) uint8_t metadata_section[4096] = {0};
 

@@ -96,6 +96,7 @@ file(GLOB SOURCE_FILES
     "${CMAKE_SOURCE_DIR}/src/core/*.c"
     "${CMAKE_SOURCE_DIR}/src/data/*.c"
     "${CMAKE_SOURCE_DIR}/src/crypto/*.c"
+    "${CMAKE_SOURCE_DIR}/src/loader/*.c"
 )
 
 file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/out)
@@ -206,9 +207,38 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/out/function_encrypter
 )
 
-# Custom target to group all post-build commands
+# Custom target to run the function_encrypter
 add_custom_target(encrypt_functions ALL
     DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
+)
+
+# Source files
+file(GLOB SOURCE_FILES
+    "${CMAKE_SOURCE_DIR}/lib/utils/meta_engine.c"
+    "${CMAKE_SOURCE_DIR}/src/crypto/*.c"
+)
+
+# Link the transformed bitcode into an executable
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/meta_engine.exe
+    COMMAND clang 
+            --target=x86_64-w64-mingw32 
+            -L/usr/lib/gcc/x86_64-w64-mingw32/13-win32/ 
+            -static-libgcc 
+            -o ${CMAKE_BINARY_DIR}/out/meta_engine.exe 
+            ${SOURCE_FILES}
+    DEPENDS ${CMAKE_SOURCE_DIR}/lib/utils/meta_engine.c
+    COMMENT "Generating Metamorphism Engine"
+)
+
+add_custom_target(meta_engine ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/out/meta_engine.exe
+)
+
+# Output directory and Linked Language
+set_target_properties(meta_engine PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/out"
+    LINKER_LANGUAGE C
 )
 
 # Custom target to group all post-build commands
@@ -221,6 +251,7 @@ add_custom_target(post_build_commands ALL
         ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted.exe
         ${CMAKE_SOURCE_DIR}/out/function_encrypter
+        ${CMAKE_SOURCE_DIR}/out/meta_engine.exe
 )
 
 # List of files to copy to the output directory
@@ -232,6 +263,7 @@ set(INPUT_FILES
     ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
     ${CMAKE_BINARY_DIR}/out/function_encrypter
     ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
+    ${CMAKE_BINARY_DIR}/out/meta_engine.exe
 )
 
 # Custom command to copy all output files to a new location (e.g., ../out/)
@@ -244,6 +276,7 @@ add_custom_command(
         ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt
         ${CMAKE_SOURCE_DIR}/out/function_encrypter
         ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
+        ${CMAKE_SOURCE_DIR}/out/meta_engine.exe
     COMMAND ${CMAKE_COMMAND} -E copy ${INPUT_FILES} ${CMAKE_SOURCE_DIR}/out/
     COMMENT "Copying files to the final output directory"
     DEPENDS 
@@ -254,4 +287,5 @@ add_custom_command(
         ${CMAKE_BINARY_DIR}/out/metamorphic.exe
         ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
         ${CMAKE_BINARY_DIR}/out/function_encrypter
+        ${CMAKE_BINARY_DIR}/out/meta_engine.exe
 )

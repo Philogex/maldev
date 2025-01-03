@@ -14,4 +14,5 @@ things to do:
 
 also don't ask me why the program doesn't crash atm... i know why, but i think it would be funny if it did... since i'm currently calling encrypted functions \
 i added a custom section .meta for metadata / the function offsets so i can strip the binary and still find my functions\
-went full circle now. (if you don't know what i mean it doesn't matter)
+went full circle now. (if you don't know what i mean it doesn't matter) \
+i will do code cleanup after finishing the recryption of the executable, so just the pe loader and shared memory missing

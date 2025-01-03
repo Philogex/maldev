@@ -18,18 +18,11 @@ typedef struct {
     char name[64];        // Name of the function
 } FunctionInfo;
 
-typedef struct {
-    const char *executablePath;
-    FunctionInfo *functions;
-    size_t numFunctions;
-    unsigned char recryptionKey;
-    unsigned char nextEncryptionKey;
-    UINT_PTR keyAddress;
-} ThreadData;
-
-extern void encrypt_physical_functions();
 extern void decrypt_functions();
 extern void printSectionHeaders();
+extern ULONGLONG getMetaSectionAddress(UINT_PTR baseAddress);
+extern DWORD getMetaSectionVirtualSize(UINT_PTR baseAddress);
+extern DWORD Rva2Offset(DWORD dwRva, UINT_PTR uiBaseAddress);
 extern FunctionInfo* analyzeExecutable(size_t *numFunctions);
 
 #endif // CRYPTOR_H
