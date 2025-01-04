@@ -1,4 +1,5 @@
 // This should be compiled to a pe and appended to the main executable. i don't need to modify headers, since i will load this pe manuall and the memory view doesn't need to reflect this
+// This should also be added to the function_encrypter.cpp, since big antivirus doesn't like appended executables
 #include <windows.h>
 #include <imagehlp.h>
 #include <winnt.h>
@@ -162,7 +163,7 @@ int main() {
     printf("Doing nothing :D\n");
 
     //WaitForSingleObject or something to wait for other process to terminate
-    Sleep(5000);
+    Sleep(10000);
 
     //get sharedProcessInformation
     return 0;
