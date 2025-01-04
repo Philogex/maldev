@@ -85,7 +85,6 @@ typedef NTSTATUS(NTAPI* RtlInitUnicodeString_t)
     PCWSTR SourceString
 );
 
-extern ULONGLONG getPEBasePhysicalAddress(const char* firstPEFilePath);
-extern BOOL injectAppendedPEIntoCalc();
+extern void hollowing();
 
 #endif // LOADER_H

