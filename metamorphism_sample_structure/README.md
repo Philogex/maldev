@@ -16,4 +16,5 @@ also don't ask me why the program doesn't crash atm... i know why, but i think i
 i added a custom section .meta for metadata / the function offsets so i can strip the binary and still find my functions\
 went full circle now. (if you don't know what i mean it doesn't matter) \
 i will do code cleanup after finishing the recryption of the executable, so just the pe loader and shared memory missing \
-with my currently limited understanding the loader is neccessary, since i cannot just unmap the .text section without consequences for recryption or other meta_engine tasks
+with my currently limited understanding the loader is neccessary, since i cannot just unmap the .text section without consequences for recryption or other meta_engine tasks \
+i should probably also encrypt the meta_engine.exe, since it's easily detected

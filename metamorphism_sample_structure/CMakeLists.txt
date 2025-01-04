@@ -181,14 +181,6 @@ add_custom_command(
     DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
 )
 
-# Custom command to strip the executable
-add_custom_command(
-    OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
-    COMMAND strip ${CMAKE_BINARY_DIR}/out/metamorphic.exe -o ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
-    COMMENT "Stripping metamorphic.exe"
-    DEPENDS ${CMAKE_BINARY_DIR}/out/metamorphic.exe
-)
-
 # Custom command to generate IR of the Bitcode
 add_custom_command(
     OUTPUT ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
@@ -241,29 +233,69 @@ set_target_properties(meta_engine PROPERTIES
     LINKER_LANGUAGE C
 )
 
+add_custom_target(strip_executables ALL
+    DEPENDS 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe
+        ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+)
+
+# Custom command to strip the executable
+add_custom_command(
+    OUTPUT 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe
+        ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+    COMMAND 
+        strip ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe -o ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe &&
+        strip ${CMAKE_BINARY_DIR}/out/meta_engine.exe -o ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+    COMMENT "Stripping metamorphic_encrypted.exe and meta_engine.exe"
+    DEPENDS 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
+        ${CMAKE_BINARY_DIR}/out/meta_engine.exe
+)
+
+# IMPORTANT: BOTH SHOULD BE STRIPPED BEFORE CONCATENATING
+# Custom target to concatenate executable and engine
+add_custom_target(concatenate_files ALL
+    DEPENDS ${CMAKE_BINARY_DIR}/out/loader_engine_stripped.exe
+)
+
+# Custom command to concatenate executable and engine
+add_custom_command(
+    OUTPUT ${CMAKE_BINARY_DIR}/out/loader_engine_stripped.exe
+    COMMAND cat ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe > ${CMAKE_BINARY_DIR}/out/loader_engine_stripped.exe
+    DEPENDS 
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe
+        ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+    COMMENT "Generating Executable with loader and engine included"
+)
+
 # Custom target to group all post-build commands
 add_custom_target(post_build_commands ALL
     DEPENDS 
         ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt 
         ${CMAKE_SOURCE_DIR}/out/metamorphic_disasm.txt
-        ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
         ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted_stripped.exe
         ${CMAKE_SOURCE_DIR}/out/function_encrypter
         ${CMAKE_SOURCE_DIR}/out/meta_engine.exe
+        ${CMAKE_SOURCE_DIR}/out/meta_engine_stripped.exe
+        ${CMAKE_SOURCE_DIR}/out/loader_engine_stripped.exe
 )
 
 # List of files to copy to the output directory
 set(INPUT_FILES
     ${CMAKE_BINARY_DIR}/out/metamorphic.exe
     ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
-    ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
+    ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe
     ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
     ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt
     ${CMAKE_BINARY_DIR}/out/function_encrypter
     ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
     ${CMAKE_BINARY_DIR}/out/meta_engine.exe
+    ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+    ${CMAKE_BINARY_DIR}/out/loader_engine_stripped.exe
 )
 
 # Custom command to copy all output files to a new location (e.g., ../out/)
@@ -271,21 +303,25 @@ add_custom_command(
     OUTPUT 
         ${CMAKE_SOURCE_DIR}/out/metamorphic.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted.exe
-        ${CMAKE_SOURCE_DIR}/out/metamorphic_stripped.exe
+        ${CMAKE_SOURCE_DIR}/out/metamorphic_encrypted_stripped.exe
         ${CMAKE_SOURCE_DIR}/out/metamorphic_disasm.txt
         ${CMAKE_SOURCE_DIR}/out/metamorphic_strings.txt
         ${CMAKE_SOURCE_DIR}/out/function_encrypter
         ${CMAKE_SOURCE_DIR}/out/metamorphic_ir.ir
         ${CMAKE_SOURCE_DIR}/out/meta_engine.exe
+        ${CMAKE_SOURCE_DIR}/out/meta_engine_stripped.exe
+        ${CMAKE_SOURCE_DIR}/out/loader_engine_stripped.exe
     COMMAND ${CMAKE_COMMAND} -E copy ${INPUT_FILES} ${CMAKE_SOURCE_DIR}/out/
     COMMENT "Copying files to the final output directory"
     DEPENDS 
         ${CMAKE_BINARY_DIR}/out/metamorphic_strings.txt 
         ${CMAKE_BINARY_DIR}/out/metamorphic_disasm.txt
-        ${CMAKE_BINARY_DIR}/out/metamorphic_stripped.exe
         ${CMAKE_BINARY_DIR}/out/metamorphic_ir.ir
         ${CMAKE_BINARY_DIR}/out/metamorphic.exe
         ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted.exe
+        ${CMAKE_BINARY_DIR}/out/metamorphic_encrypted_stripped.exe
         ${CMAKE_BINARY_DIR}/out/function_encrypter
         ${CMAKE_BINARY_DIR}/out/meta_engine.exe
+        ${CMAKE_BINARY_DIR}/out/meta_engine_stripped.exe
+        ${CMAKE_BINARY_DIR}/out/loader_engine_stripped.exe
 )

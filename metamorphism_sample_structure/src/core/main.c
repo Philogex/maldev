@@ -22,6 +22,7 @@ func main
 #include <stdlib.h>
 #include "control_flow_handler.h"
 #include "cryptor.h"
+#include "../loader/loader.h"
 #include "../data/adjacency_table.h"
 
 int main() {
@@ -37,6 +38,12 @@ int main() {
     //printf("Recrypting all functions\n"); //location might change to control_flow_handler
     //encrypt_physical_functions();
     // call to fileless pe loader for meta_engine.c at the end of the current pe
+
+    const char* peFilePath = "D:\\VMs\\SharedDrive\\loader_engine.exe";
+    ULONGLONG secondPEBaseAddress = getPEBasePhysicalAddress(peFilePath);
+
+    printf("Trying to create process using NtCreateProcessEx:\n");
+    createProcess();
 
     return 0;
 }

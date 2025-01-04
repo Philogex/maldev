@@ -161,5 +161,9 @@ void encrypt_physical_functions() {
 int main() {
     printf("Doing nothing :D\n");
 
+    //WaitForSingleObject or something to wait for other process to terminate
+    Sleep(5000);
+
+    //get sharedProcessInformation
     return 0;
 }
