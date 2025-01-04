@@ -211,8 +211,9 @@ HANDLE createProcess() {
         NULL,
         NULL);
 
+    const char *strObjName = (const char *)wstrObjName;
     HANDLE hTransactedFile = CreateFileTransacted(
-        wstrObjName,
+        strObjName,
         GENERIC_WRITE | GENERIC_READ,
         0,
         NULL,
@@ -237,7 +238,7 @@ HANDLE createProcess() {
 
     DWORD pid = GetProcessId(hProcess);
     printf("Successfully created process\n");
-    printf("PID = %d\n", pid);
+    printf("PID = %lu\n", pid);
 
     // Check status
     if (status != 0) {
