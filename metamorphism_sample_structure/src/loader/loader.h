@@ -2,6 +2,8 @@
 #define LOADER_H
 
 #include <windows.h>
+#include <tlhelp32.h>
+#include <ntdef.h>
 #include <winternl.h>
 #include <imagehlp.h>
 #include <winnt.h>
@@ -65,6 +67,11 @@ typedef NTSTATUS (NTAPI *fpNtCreateSection)
     ULONG SectionPageProtection,
     ULONG AllocationAttributes,
     HANDLE FileHandle
+);
+
+
+typedef NTSTATUS (NTAPI *fpNtResumeProcess)(
+  HANDLE ProcessHandle
 );
 
 typedef NTSTATUS (NTAPI *fpNtClose)
