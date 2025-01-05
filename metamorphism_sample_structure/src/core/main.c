@@ -39,7 +39,7 @@ int main() {
     //encrypt_physical_functions();
     // call to fileless pe loader for meta_engine.c at the end of the current pe
 
-    printf("Trying to create process: Prayge\n");
+    printf("Creating secondary Process:\n");
     hollowing();
 
     return 0;

