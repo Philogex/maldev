@@ -1,20 +1,15 @@
-the control flow spidering might not seem very practical, but im honestly just trying to make it as difficult as possible to understand what is going on \
-rest is coming at a later date unless i get bombarded by uni work again \
+all of this raises a lot of flags for edrs, so im not sure of how to evaluate the practicality for now. \
+this is currently fully functional. just a proof of concept with a few parts missing, but nontheless what i originally planned \
+rest is coming at a later date since i am getting bombarded by uni work again \
 \
 obfuscation_pass is planned \
-encryption_pass is currently used to write metadata (not yet implemented, just another idea) for the post build program function_encrypter to do as the name implies using said metadata. this way i can annotate the functions i want to encrypt and have a seamless programming experience \
-i just realized, that i have PIC enabled, so i don't have to worry about relocation for 99% of cases, and as long as i don't do anything stupid i won't have to manually configure the .reloc \
-i just finished doing just that. like the line right above this \
-things to do:
-- dynamic recrypting of functions and writing to disk
-- generating and processing of metadata between function_encrypter.cpp and encryption_pass.cpp (metadata also has to include the custom key for aes generated during compile process)
-- currently looking for a way to properly set the aes key. i will probably set it at the end of my .meta section for now
+encryption_pass is currently used to write metadata for the post build program function_encrypter to do as the name implies using said metadata. this way i can annotate the functions i want to encrypt and have a seamless programming experience \
+things to do for now (in order):
+- function_encrypter.cpp needs to calculate the stripped and unstripped offsets of my functions and the .meta section so i don't have to use a magic number offset in source. this also needs to be included in the .bin i write to the section
+- cleanup of the code base
+- encryption of the meta_engine.exe
 - implementing aes encryption inside aes.c or currently aes.h
 - not really sure how i can reincrypt with aes without having to load everything into memory, decrypting and then reincrypting
-
-also don't ask me why the program doesn't crash atm... i know why, but i think it would be funny if it did... since i'm currently calling encrypted functions \
-i added a custom section .meta for metadata / the function offsets so i can strip the binary and still find my functions\
-went full circle now. (if you don't know what i mean it doesn't matter) \
-i will do code cleanup after finishing the recryption of the executable, so just the pe loader and shared memory missing \
+- very unspecific, but fill in the missing c2 components and weaponize the core structure (i have no interest in actually weaponizing it, just make it somewhat realistic or useful)
+\
 with my currently limited understanding the loader is neccessary, since i cannot just unmap the .text section without consequences for recryption or other meta_engine tasks \
-i should probably also encrypt the meta_engine.exe, since it's easily detected
