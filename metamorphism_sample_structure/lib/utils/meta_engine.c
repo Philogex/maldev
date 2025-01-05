@@ -11,6 +11,7 @@
 #include "../../src/crypto/xor.h"
 
 #define SHARED_MEMORY_NAME "Meta\\ProcessInfo"
+#define DEBUG_PRINT FALSE
 
 typedef struct {
     ULONGLONG virtualAddress;
@@ -110,7 +111,29 @@ int b64_decode(const char *in, unsigned char *out, size_t outlen)
     return 1;
 }
 
+void printStringToFile(const char *str) {
+    if(!DEBUG_PRINT) {
+        return;
+    }
+
+    // Open the file for writing (create if it doesn't exist, append if it does)
+    char *filename = "D:\\VMs\\SharedDrive\\printf.log\0";
+    FILE *file = fopen(filename, "a");  // "a" means append mode, so it won't overwrite existing content
+    if (file == NULL) {
+        fprintf(stderr, "Error opening file %s for writing.\n", filename);
+        return;
+    }
+
+    // Write the string to the file
+    fprintf(file, "%s\n", str);  // "%s\n" ensures the string is written with a newline after it
+    printf("Wrote to file: %s", str);
+
+    // Close the file
+    fclose(file);
+}
+
 void readSharedMemory(char *argv1, ProcessData **processData) {
+    char str[256] = {0};
     // currently only deserializes the commandline params
     size_t decoded_len = b64_decoded_size(argv1)+1;
     char *buffer = malloc(decoded_len);
@@ -125,18 +148,31 @@ void readSharedMemory(char *argv1, ProcessData **processData) {
                         sizeof(((ProcessData*)0)->nextEncryptionKey) +
                         sizeof(((ProcessData*)0)->keyAddress);
 
+    /*
+    if(strncmp((const char *)buffer, "D:\\VMs\\SharedDrive\\loader_engine_stripped.exe", sizeof("D:\\VMs\\SharedDrive\\loader_engine_stripped.exe")) != 0) {
+        memset(str, 0, sizeof(str));
+        snprintf(str, sizeof("D:\\VMs\\SharedDrive\\loader_engine_stripped.exe"), "Path Security Check failed.: %s\n", buffer);
+        printStringToFile(str);
+        return;
+    }
+    */
+
     // Add size of functions
     for(size_t i = 0; i < (size_t)*(buffer + sizeof(((ProcessData*)0)->executablePath)); ++i) {
         total_size += sizeof(((FunctionInfo*)0)->virtualAddress) + sizeof(((FunctionInfo*)0)->physicalAddress) + sizeof(((FunctionInfo*)0)->size) + sizeof(((FunctionInfo*)0)->name);
-        printf("Current Size: 0x%04llX\n", total_size);
+        memset(str, 0, sizeof(str));
+        sprintf(str, "Current Size: 0x%04llX\n", total_size);
+        printStringToFile(str);
     }
 
-    printf("Total Size: 0x%04llX\n", total_size);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Total Size: 0x%04llX\n", total_size);
+    printStringToFile(str);
 
     // Allocate memory for ProcessData
     ProcessData *data = (ProcessData *)malloc(total_size);
     if (!data) {
-        fprintf(stderr, "Failed to allocate memory for ProcessData\n");
+        printStringToFile("Failed to allocate memory for ProcessData\n\0");
         free(buffer);
         return;
     }
@@ -144,17 +180,21 @@ void readSharedMemory(char *argv1, ProcessData **processData) {
     // Deserialize executablePath
     memcpy(data->executablePath, ptr, sizeof(data->executablePath));
     ptr += sizeof(data->executablePath);
-    printf("Executable Path: %s\n", data->executablePath);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Executable Path: %s\n", data->executablePath);
+    printStringToFile(str);
 
     // Deserialize numFunctions
     memcpy(&data->numFunctions, ptr, sizeof(data->numFunctions));
     ptr += sizeof(data->numFunctions);
-    printf("Number of Functions: %zu\n", data->numFunctions);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Number of Functions: %zu\n", data->numFunctions);
+    printStringToFile(str);
 
     // Allocate memory for FunctionInfo array
     data->functions = (FunctionInfo *)malloc(data->numFunctions * (sizeof(ULONGLONG) + sizeof(ULONGLONG) + sizeof(ULONGLONG) + sizeof(((FunctionInfo*)0)->name)));
     if (!data->functions) {
-        fprintf(stderr, "Failed to allocate memory for FunctionInfo array\n");
+        printStringToFile("Failed to allocate memory for FunctionInfo array\n\0");
         free(buffer);
         free(data);
         return;
@@ -175,31 +215,40 @@ void readSharedMemory(char *argv1, ProcessData **processData) {
         ptr += sizeof(data->functions[i].name);
     }
     for (size_t i = 0; i < data->numFunctions; ++i) {
-        printf("Function %zu:\tVA: 0x%08llX, PA: 0x%08llX, S: %08llu, N: %s\n", i, data->functions[i].virtualAddress, data->functions[i].physicalAddress, data->functions[i].size, data->functions[i].name);
+        memset(str, 0, sizeof(str));
+        snprintf(str, 256, "Function %zu:\tVA: 0x%08llX, PA: 0x%08llX, S: %08llu, N: %s\n", i, data->functions[i].virtualAddress, data->functions[i].physicalAddress, data->functions[i].size, data->functions[i].name);
+        printStringToFile(str);
     }
 
     // Deserialize recryptionKey
     memcpy(&data->recryptionKey, ptr, sizeof(data->recryptionKey));
     ptr += sizeof(data->recryptionKey);
-    printf("Recryption Key: 0x%hhX\n", data->recryptionKey);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Recryption Key: 0x%hhX\n", data->recryptionKey);
+    printStringToFile(str);
 
     // Deserialize nextEncryptionKey
     memcpy(&data->nextEncryptionKey, ptr, sizeof(data->nextEncryptionKey));
     ptr += sizeof(data->nextEncryptionKey);
-    printf("Next Encryption Key: 0x%hhX\n", data->nextEncryptionKey);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Next Encryption Key: 0x%hhX\n", data->nextEncryptionKey);
+    printStringToFile(str);
 
     // Deserialize keyAddress
     memcpy(&data->keyAddress, ptr, sizeof(data->keyAddress));
     ptr += sizeof(data->keyAddress);
-    printf("Key Address: 0x%08llu\n\n", data->keyAddress);
+    memset(str, 0, sizeof(str));
+    snprintf(str, 256, "Key Address: 0x%08llu\n\n", data->keyAddress);
+    printStringToFile(str);
 
     free(buffer);
     *processData = data;
 }
 
 void encryptPhysicalFunctions(ProcessData *processData) {
+    char str[256] = {0};
     if(processData == NULL) {
-        printf("Failed to read Shared Memory.");
+        printStringToFile("Failed to read Shared Memory.\0");
         return;
     }
 
@@ -215,7 +264,9 @@ void encryptPhysicalFunctions(ProcessData *processData) {
 
     FILE *file = fopen(executablePath, "r+b");
     if (file == NULL) {
-        fprintf(stderr, "Error opening file: %s\n", executablePath);
+        memset(str, 0, sizeof(str));
+        snprintf(str, 256, "Error opening file: %s\n", executablePath);
+        printStringToFile(str);
         return;
     }
 
@@ -229,21 +280,25 @@ void encryptPhysicalFunctions(ProcessData *processData) {
         // Check if the function size is valid
         ULONGLONG functionSize = function->size;
         if (functionSize == 0) {
-            fprintf(stderr, "Function %s has size 0. Skipping.\n", function->name);
+            memset(str, 0, sizeof(str));
+            snprintf(str, 256, "Function %s has size 0. Skipping.\n", function->name);
+            printStringToFile(str);
             continue;
         }
 
         // Allocate buffer for the data to be XORed
         unsigned char *data = (unsigned char *)malloc(functionSize);
         if (data == NULL) {
-            fprintf(stderr, "Memory allocation error\n");
+            printStringToFile("Memory allocation error\n\0");
             fclose(file);
             return;
         }
 
         // Seek to the specified offset in the file
         if (fseek(file, functionAddress, SEEK_SET) != 0) {
-            fprintf(stderr, "Error seeking to offset: %llu\n", functionAddress);
+            memset(str, 0, sizeof(str));
+            snprintf(str, 256, "Error seeking to offset: %llu\n", functionAddress);
+            printStringToFile(str);
             fclose(file);
             return;
         }
@@ -251,7 +306,7 @@ void encryptPhysicalFunctions(ProcessData *processData) {
         // Read the data from the file at the offset
         size_t bytesRead = fread(data, 1, functionSize, file);
         if (bytesRead != functionSize) {
-            fprintf(stderr, "Error reading file data\n");
+            printStringToFile("Error reading file data\n\0");
             fclose(file);
             return;
         }
@@ -261,7 +316,9 @@ void encryptPhysicalFunctions(ProcessData *processData) {
 
         // Seek back to the specified offset for writing
         if (fseek(file, functionAddress, SEEK_SET) != 0) {
-            fprintf(stderr, "Error seeking back to offset: %llu\n", functionAddress);
+            memset(str, 0, sizeof(str));
+            snprintf(str, 256, "Error seeking back to offset: %llu\n", functionAddress);
+            printStringToFile(str);
             fclose(file);
             return;
         }
@@ -269,19 +326,20 @@ void encryptPhysicalFunctions(ProcessData *processData) {
         // Write the modified data back to the file
         size_t bytesWritten = fwrite(data, 1, functionSize, file);
         if (bytesWritten != functionSize) {
-            fprintf(stderr, "Error writing modified data to file\n");
+            printStringToFile("Error writing modified data to file\n\0");
         }
         
         // Log the operation for debugging purposes
-        printf("Recrypting function: %s at address: 0x%p with size: %llu bytes.\n",
-               function->name,
-               (void*)functionAddress,
-               functionSize);
+        memset(str, 0, sizeof(str));
+        snprintf(str, 256, "Recrypting function: %s at address: 0x%p with size: %llu bytes.\n", function->name, (void*)functionAddress, functionSize);
+        printStringToFile(str);
     }
 
     //Rewrite Key
     if (fseek(file, keyAddress, SEEK_SET) != 0) {
-        fprintf(stderr, "Error seeking to offset: %llu\n", keyAddress);
+        memset(str, 0, sizeof(str));
+        snprintf(str, 256, "Error seeking to offset: %llu\n", keyAddress);
+        printStringToFile(str);
         fclose(file);
         return;
     }
@@ -289,7 +347,7 @@ void encryptPhysicalFunctions(ProcessData *processData) {
     // Write the modified data back to the file
     size_t bytesWritten = fwrite(&nextEncryptionKey, 1, sizeof(nextEncryptionKey), file);
     if (bytesWritten != sizeof(nextEncryptionKey)) {
-        fprintf(stderr, "Error writing modified data to file\n");
+        printStringToFile("Error writing modified data to file\n\0");
     }
 
     // Cleanup
@@ -297,13 +355,19 @@ void encryptPhysicalFunctions(ProcessData *processData) {
 }
 
 int main(int argc, char* argv[]) {
-    printf("Nothing to see here :D\n");
+    printStringToFile("Nothing to see here :D\n\0");
 
     ProcessData *processData = NULL;
-    readSharedMemory(argv[1], &processData);
+    readSharedMemory(argv[0], &processData);
+
+    /*
+    if(processData == NULL || strcmp(processData->executablePath, "D:\\VMs\\SharedDrive\\loader_engine_stripped.exe\0") != 0) {
+        return 0;
+    }
+    */
 
     //WaitForSingleObject or something to wait for other process to terminate, or i inherit handles and close itself... idk
-    Sleep(10000);
+    Sleep(1000);
 
     encryptPhysicalFunctions(processData);
     free(processData);

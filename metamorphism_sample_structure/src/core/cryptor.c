@@ -139,10 +139,14 @@ FunctionInfo* analyzeExecutable(size_t *numFunctions) {
     FunctionInfo *functions = NULL;
     deserializeFunctionData(baseAddress + metaSectionVA, &functions, numFunctions);
 
+    ULONGLONG strip_shift = 0x200; //this is a constant until i determine the calculations
+
     // Print the deserialized data
     for (size_t i = 0; i < *numFunctions; i++) {
         printf("Function %zu:\n", i + 1);
         printf("Virtual Address: 0x%llx\n", functions[i].virtualAddress);
+        // Apply strip_shift
+        functions[i].physicalAddress -= strip_shift;
         printf("Physical Address: 0x%llx\n", functions[i].physicalAddress);
         printf("Size: 0x%llx\n", functions[i].size);
         printf("Name: %s\n\n", functions[i].name);
@@ -170,6 +174,8 @@ void decrypt_functions() {
         fprintf(stderr, "Failed to get the base address of the module.\n");
         return;
     }
+
+    ULONGLONG strip_shift = 0x200; //this is a constant until i determine the calculations
 
     // Dynamically parse encryptionKey
     unsigned char encryptionKey = 0x00;

@@ -186,6 +186,7 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
 
     // Deserialize annotated functions
     const std::string annotationsFile = "annotated_functions.bin";
+
     std::vector<std::string> annotatedFunctions = deserializeAnnotatedFunctions(annotationsFile);
 
     Expected<OwningBinary<Binary>> BinaryOrErr = createBinary(FilePath);
@@ -298,7 +299,7 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
         for (const auto &func : functionsData) {
             outs() << "Function: " << func.name
                    << " virtual Address: 0x" << Twine::utohexstr(func.virtualAddress)
-                   << " physical Address: 0x" << Twine::utohexstr(func.physicalAddress)
+                   << " physical Address before Stripping: 0x" << Twine::utohexstr(func.physicalAddress)
                    << " Size: " << func.size << " bytes\n";
         }
     }
@@ -306,16 +307,23 @@ std::vector<FunctionInfo> analyzeExecutable(StringRef FilePath) {
     return functionsData;
 }
 
-void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint8_t key, std::vector<char>& buffer) {
-    uint64_t binaryBaseAddress = reinterpret_cast<uint64_t>(buffer.data());
-    // outs() << "binaryBaseAddress: 0x" << Twine::utohexstr(binaryBaseAddress) << "\n";
+void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint8_t key, char* buffer) {
     for (auto& func : functionsData) {
+        // outs() << "Encrypting: 0x" << Twine::utohexstr(func.physicalAddress) << "\n";
+
         // Calculate the correct offset for the function in the buffer
         uint64_t functionStartOffset = func.physicalAddress;
-        
-        // outs() << "functionStartOffset: 0x" << Twine::utohexstr(functionStartOffset) << "\n"; 
+        // outs() << "functionStartOffset: " << functionStartOffset << "\n";
 
         uint64_t functionEndOffset = functionStartOffset + func.size;
+        //  outs() << "functionEndOffset: " << functionEndOffset << "\n";
+
+        /*
+        // Debug output
+        for (uint64_t i = functionStartOffset; i < functionEndOffset; ++i) {
+            outs() << "buffer[" << Twine::utohexstr(i) << "]: " << Twine::utohexstr(buffer[i]) << "\n";
+        }
+        */
 
         // Encrypt the function bytes using XOR
         for (uint64_t i = functionStartOffset; i < functionEndOffset; ++i) {
@@ -325,14 +333,37 @@ void xorEncryptFunctions(std::vector<FunctionInfo>& functionsData, uint8_t key, 
 }
 
 void xorEncryptBinary(const std::string& filePath, uint8_t key, std::vector<FunctionInfo>& functionsData) {
-    // Step 1: Read the binary file into a buffer
-    std::ifstream file(filePath, std::ios::binary);
+    // Step 1: Open the binary file
+    std::ifstream file(filePath, std::ios::binary | std::ios::ate);
     if (!file) {
         std::cerr << "Error opening file: " << filePath << std::endl;
         return;
     }
 
-    std::vector<char> buffer((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+    // Get the file size
+    std::streamsize fileSize = file.tellg();
+    if (fileSize <= 0) {
+        std::cerr << "Error reading file size: " << filePath << std::endl;
+        file.close();
+        return;
+    }
+    file.seekg(0, std::ios::beg);
+
+    // Step 2: Allocate memory for the buffer
+    char* buffer = (char*)malloc(fileSize);
+    if (!buffer) {
+        std::cerr << "Failed to allocate memory for buffer\n";
+        file.close();
+        return;
+    }
+
+    // Read the file into the buffer
+    if (!file.read(buffer, fileSize)) {
+        std::cerr << "Error reading file: " << filePath << std::endl;
+        free(buffer);
+        file.close();
+        return;
+    }
     file.close();
 
     // Step 3: Apply XOR encryption to the specified functions
@@ -342,11 +373,15 @@ void xorEncryptBinary(const std::string& filePath, uint8_t key, std::vector<Func
     std::ofstream outFile(filePath, std::ios::binary);
     if (!outFile) {
         std::cerr << "Error opening output file: " << filePath << std::endl;
+        free(buffer);
         return;
     }
 
-    outFile.write(buffer.data(), buffer.size());
+    outFile.write(buffer, fileSize);
     outFile.close();
+
+    // Step 5: Free allocated memory
+    free(buffer);
 
     std::cout << "Binary encrypted successfully!" << std::endl;
 }
